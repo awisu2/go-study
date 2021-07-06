@@ -17,4 +17,5 @@ note: updateはインストーラの再実行
 1. create go.mod: `go mod init example.com/hello`
    - it have line `module example.com/hello"`
 2. create "hello.go"
-3. run: `go run .`
+3. tidy module: `go mod tidy`
+4. run: `go run .`
