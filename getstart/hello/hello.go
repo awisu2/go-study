@@ -2,16 +2,33 @@ package main
 
 import (
 	"fmt"
+	"log"
 
 	"example.com/greetings"
 	"rsc.io/quote"
 )
 
 func main() {
-    fmt.Println("Hello, World!")
+		log.SetPrefix("greetings: ")
+		log.SetFlags(0)
+
+		fmt.Println("Hello, World!")
 
 		fmt.Println(quote.Go())
 
-		message := greetings.Hello("foo")
+		// get hello
+		message, err := greetings.Hello("foo")
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		fmt.Println(message)
+
+		// get error
+		message2, err := greetings.Hello("")
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		fmt.Println(message2)
 }
