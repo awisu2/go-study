@@ -37,12 +37,12 @@ func main() {
 	}
 
 
-
 	// end
 	log.Fatal("sample finish! (this is fake fatal)")
 }
 
-// error は最後の引数
+// public: 先頭大文字s
+// error: 最後の引数
 func Division(a int, b int) (int, error) {
 	if b == 0 {
 		// create error
