@@ -11,6 +11,11 @@
     - 利用可能なディレクトリであればどこでも OK
     - os(process)ごとに１つしか指定できない
       - (開発元の異なるなど)ディレクトリを分けたい場合逐一切り替える必要あり
+- test: `go test`
+  - 命名規則: file: `Xxx_test.go`, func: `TestXxx`
+    - ファイル名は何でも良い、func 名が package 内でかぶると (普通に) redeclared error
+  - Package がずれていると動作しないみたい: `found packages main (simple_sample.go)...`
+    - simple_sample_test.go の　 package を main に変えたら動いた
 
 簡単サンプルコード
 

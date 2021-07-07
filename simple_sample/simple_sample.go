@@ -14,20 +14,38 @@ func init() {
 }
 
 func main() {
-	fmt.Println("hello")
-	log.Println("log hello")
+	// `:=`: 宣言と値のセットを同時に行う(`var msg string` & `msg = "hello"`)
+	msg := "hello"
 
-	a, b := 9, 3
-	c, err := division(a,  b)
-	if err != nil {
-		log.Fatal(err)
+	fmt.Println(msg)
+	log.Printf("log %s\n", msg)
+
+	// slice: `var mySlice []int` array: `var myArray[3] int`
+	// sliceのほうが扱いやすいとのこと
+	nums := []int{1, 2, 3, 4, 5, 6, 7, 8, 9}
+	nums = append(nums, 0)
+
+	for i := 0; i < len(nums) - 1; i++ {
+		c, err := Division(nums[i],  nums[i+1])
+		if err != nil {
+			// go's log level just two. (print or Fatal)
+			// log.Fatal(err)
+			log.Println(err)
+		} else {
+			log.Printf("%d / %d = %d", nums[i], nums[i+1], c)
+		}
 	}
-	log.Printf("%d / %d = %d", a, b, c)
+
+
+
+	// end
+	log.Fatal("sample finish! (this is fake fatal)")
 }
 
 // error は最後の引数
-func division(a int, b int) (int, error) {
+func Division(a int, b int) (int, error) {
 	if b == 0 {
+		// create error
 		return 0, errors.New("b can't 0")
 	}
 
