@@ -24,6 +24,14 @@ func main() {
 
 		fmt.Println(message)
 
+		// get hellos
+		names := []string{"foo", "bar", "smith", "neo"}
+		messages, err := greetings.Hellos(names)
+		if err != nil {
+			log.Fatal(err)
+		}
+		fmt.Println(messages)
+
 		// get error
 		message2, err := greetings.Hello("")
 		if err != nil {
