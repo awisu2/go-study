@@ -21,4 +21,6 @@ go run server.go
 
 ## access test
 
+note: use "httpie" (python's module. `pip install httpie`)
+
 - upload image: `http -f POST :1323/images name=test.png image@cycle.png`
