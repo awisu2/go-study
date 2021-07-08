@@ -1,6 +1,8 @@
 # server-echo
 
 - `go run server.go` 時に windows のセキュリティアラートが出る: e.Start にドメインを付与する(e.Start(localhost:1323))
+- db: `docker-compose up` (docker で動作せています。基本 default)
+  - `PGPASSWORD=postgres psql -h localhost -U postgres -d postgres`
 
 ## links
 
