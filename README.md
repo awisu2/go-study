@@ -13,21 +13,10 @@
   - Package がずれていると動作しないみたい: `found packages main (simple_sample.go)...`
     - simple_sample_test.go の　 package を main に変えたら動いた
 
-簡単サンプルコード
+## links
 
-```go
-func main() {
-  msg := "foo"
-  fmt.Println(msg)
-
-
-}
-
-func init() {
-  log.SetPrefix("sample")
-  log.SetFlags(0)
-}
-```
+- [The Go Programming Language](https://golang.org/)
+- [A Tour of Go](https://go-tour-jp.appspot.com/welcome/1)
 
 ## commands
 
@@ -40,6 +29,30 @@ func init() {
 - build: `go build`
   - check install path (it builded): `go list -f {{.Target}}`
     - これを環境変数の PATH に入れておけばビルドしたコマンドが利用できる
+
+## install
+
+[Download and install - The Go Programming Language](https://golang.org/doc/install)
+
+### linux
+
+```bash
+# install
+GOFILE="go1.16.5.linux-amd64.tar.gz"
+cd
+wget https://golang.org/dl/${GOFILE}
+sudo rm -rf /usr/local/go
+sudo tar -C /usr/local -xzf ${GOFILE}
+
+# add path (if not exists)
+cat - << 'EOF' > ~/.bash_profile
+# go
+export PATH=$PATH:/usr/local/go/bin
+EOF
+
+# after restart
+go version
+```
 
 ## 環境変数
 
