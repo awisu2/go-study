@@ -6,6 +6,8 @@ import (
 	"fmt"
 	"log"
 	"math"
+
+	"go-study/simple_sample/sub"
 )
 
 // const は　character, string, bool, int　のみ
@@ -43,6 +45,8 @@ func main() {
 		}
 	}
 
+	// call module
+	fmt.Println(sub.Hello())
 
 	// end
 	log.Fatal("sample finish! (this is fake fatal)")
