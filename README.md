@@ -12,6 +12,9 @@
     - ファイル名は何でも良い、func 名が package 内でかぶると (普通に) redeclared error
   - Package がずれていると動作しないみたい: `found packages main (simple_sample.go)...`
     - simple_sample_test.go の　 package を main に変えたら動いた
+- vscode での補完がおかしい: vscode workspace root = go pacakgae root である必要があるとのこと
+  - このリポジトリの用に小ディレクトリに package 置いていると発生する
+  - add folder to workspace で root になるようにしてやれば OK
 
 ## links
 

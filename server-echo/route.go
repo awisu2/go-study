@@ -1,10 +1,11 @@
 package main
 
 import (
+	"encoding/json"
 	"go-study/server-echo/controllers"
 	"net/http"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 func Routing(e *echo.Echo) {
@@ -15,12 +16,28 @@ func Routing(e *echo.Echo) {
 	})
 
 	// user
-	e.POST("/users", controllers.SaveUser)
-	e.GET("/users", controllers.GetsUser)
-	e.GET("/users/:id", controllers.GetUser)
-	e.PUT("/users/:id", controllers.UpdateUser)
-	e.DELETE("/users/:id", controllers.DeleteUser)
+	{
+		g := e.Group("users")
+		g.POST("", controllers.SaveUser)
+		g.GET("", controllers.GetsUser)
+		g.GET("/:id", controllers.GetUser)
+		g.PUT("/:id", controllers.UpdateUser)
+		g.DELETE("/:id", controllers.DeleteUser)
+	}
 
 	// images
-	e.POST("/images", controllers.SaveImage)
+	{
+		g := e.Group("images")
+		g.POST("", controllers.SaveImage)
+	}
+
+
+	// route list
+	e.GET("routes", func(c echo.Context) error {
+		if data, err := json.MarshalIndent(e.Routes(), "", " "); err == nil {
+			return c.String(http.StatusOK, string(data))
+		} else {
+				return err
+		}
+	})
 }

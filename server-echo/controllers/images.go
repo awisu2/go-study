@@ -6,7 +6,7 @@ import (
 	"os"
 	"path"
 
-	"github.com/labstack/echo"
+	"github.com/labstack/echo/v4"
 )
 
 func SaveImage(c echo.Context) error {
