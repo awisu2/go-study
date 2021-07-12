@@ -1,15 +1,24 @@
 package main
 
+// 複数パッケージのインストール
 import (
 	"errors"
 	"fmt"
 	"log"
 	"math"
+
+	"go-study/simple_sample/sub"
 )
+
+// const は　character, string, bool, int　のみ
+const MODULE_NAME = "simple_sample"
+
+// 関数外でも var で宣言できる(":=" は不可)
+var moduleName = MODULE_NAME
 
 func init() {
 	// log setting
-	log.SetPrefix("simple_sample: ")
+	log.SetPrefix(moduleName + ": ")
 	log.SetFlags(0)
 }
 
@@ -36,19 +45,23 @@ func main() {
 		}
 	}
 
+	// call module
+	fmt.Println(sub.Hello())
 
 	// end
 	log.Fatal("sample finish! (this is fake fatal)")
 }
 
-// public: 先頭大文字s
-// error: 最後の引数
-func Division(a int, b int) (int, error) {
+// 同じ型の場合、最後の宣言以外は省略できる
+// public化: 先頭大文字
+// error: 返却値の最後に設置
+func Division(a , b int) (int, error) {
 	if b == 0 {
 		// create error
 		return 0, errors.New("b can't 0")
 	}
 
+	// キャスト: T(v)
 	// 四捨五入: math.Round(float64), 切り捨て: math.Floor(float64), 切り上げ: math.Ceil(float64)
 	return int(math.Round(float64(a)  / float64(b))), nil
 }
