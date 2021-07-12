@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"html/template"
 	"io"
 	"log"
@@ -18,6 +19,7 @@ func main() {
 	Routing(e)
 
 	seTemplate(e)
+	setJson(e)
 
 	// host情報を削るとwindowsのセキュリティアラートが毎回出る
 	e.Logger.Fatal(e.Start("localhost:1323"))
@@ -69,5 +71,28 @@ func seTemplate(e *echo.Echo) {
 		}
 		return err
 	})
+}
 
+// json get/response
+type JsonParams struct {
+	Id string `json:"id"`
+}
+
+type ErrorResponse struct {
+	Error string `json:"error"`
+}
+
+func setJson(e *echo.Echo) {
+	// try: `http POST http://localhost:1323/json id=123`
+	e.POST("/json", func(c echo.Context) error {
+		// get json params
+		params := JsonParams{}
+		if err := c.Bind(&params); err != nil {
+			return c.JSON(http.StatusBadRequest, ErrorResponse{err.Error()})
+		}
+		fmt.Println(params)
+
+		// response json
+		return c.JSON(http.StatusOK, params)
+	})
 }
