@@ -1,6 +1,7 @@
 package controllers
 
 import (
+	"go-study/server-echo/db"
 	"log"
 	"net/http"
 
@@ -17,8 +18,15 @@ func SaveUser(c echo.Context) error {
 func GetsUser(c echo.Context) error {
 	// User ID from path `users/:id`
 	log.Println("gdsgasdgasd")
-	id := c.Param("id")
-	return c.String(http.StatusOK, id)
+
+	// _db := OpenSQLiteConnection()
+	// defer _db.Close()
+
+	db.TryDB()
+
+
+
+	return c.String(http.StatusOK, "hi!")
 }
 
 func GetUser(c echo.Context) error {
