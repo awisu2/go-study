@@ -4,6 +4,7 @@
 
 - install: [Download and install - The Go Programming Language](https://golang.org/doc/install)
 - commands: 後述
+  - モジュールを作るとき: `go mod init {domain/module}`
 - packages: [pkg.go.dev](https://pkg.go.dev/)
 - 環境変数(GOPATH, GOROOT, GOBIN...): 後述
 - GOPATH に縛られたくない: 無理。(どうしても必要なら GOPATH の自動切り替え環境を用意)
@@ -22,6 +23,9 @@
 - [A Tour of Go](https://go-tour-jp.appspot.com/welcome/1)
 
 ## commands
+
+go には module モードと、GOPATH モードがある。デフォルトでは module モードで、GOPATH モードは GOPATH 配下にすべてを詰め込む旧仕様。
+module モードにすることで、module のバージョンなどを分離できる。。。らしい。 go.mod がその役目？
 
 - init: `go mod init {domain/module}`
 - run: `go run .`
