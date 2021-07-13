@@ -1,4 +1,4 @@
-package controllers
+package apis
 
 import (
 	"go-study/server-echo/models"

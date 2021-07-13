@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"io"
@@ -29,6 +30,9 @@ func main() {
 }
 
 // template setting
+//
+// [template · pkg.go.dev](https://pkg.go.dev/text/template#Must)
+//
 type Template struct {
 	templates *template.Template
 }
@@ -42,10 +46,39 @@ type User struct {
 }
 
 func seTemplate(e *echo.Echo) {
+	// template.New: 指定されたnameでユニークに allocates する
+	tpl := template.New("base")
+
+	// template用 拡張関数
+	customFuncs := map[string]interface{} {
+		"hello": func () string {
+			return "hello world!"
+		},
+		// 第一引数にテンプレート名を指定することで、引数からでもtemplateを実行する
+		//
+		// default の {{template}} では name に変数を割り当てることができず、header, footerを毎回記述する必要がありそうなため追加
+		//
+		"dynamicTemplate": func(name string, data interface{}) (template.HTML, error) {
+				buf := bytes.NewBuffer([]byte{})
+				err := tpl.ExecuteTemplate(buf, name, data)
+				if err != nil {
+					return "", err
+				}
+				html := template.HTML(buf.String())
+				return html, nil
+		},		
+	}
+
 	// Render にtemplateをセット
 	t := &Template{
 		// ここで指定したファイル群がキャッシュされる。
-		templates: template.Must(template.ParseGlob("assets/templates/*.html")),
+		// template.Must: 生成したテンプレートインスタンスを受け取り、第2引数のerrが != nil のときpnic
+		// template.Funcs: 拡張関数の割当 (Parseより前にセットする必要あり)
+		// template.ParseGlob: パターンにより対象ファイルからテンプレート情報を生成する
+		templates: template.Must(
+			tpl.
+				Funcs(customFuncs).
+				ParseGlob("assets/templates/*.html")),
 	}
 	e.Renderer = t
 
@@ -74,6 +107,19 @@ func seTemplate(e *echo.Echo) {
 		}
 		return err
 	})
+
+
+  //   // provide a func in the FuncMap which can access tpl to be able to look up templates
+    
+	// 	template.New()
+	// 	t.Funcs(map[string]interface{}{
+	// 		"CallTemplate": func(name string, data interface{}) (ret template.HTML, err error) {
+	// 				buf := bytes.NewBuffer([]byte{})
+	// 				err = *t.ExecuteTemplate(buf, name, data)
+	// 				ret = template.HTML(buf.String())
+	// 				return
+	// 		},
+	// })	
 }
 
 // json get/response
