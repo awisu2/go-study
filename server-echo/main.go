@@ -7,6 +7,8 @@ import (
 	"log"
 	"net/http"
 
+	"go-study/server-echo/models"
+
 	"github.com/labstack/echo/v4"
 )
 
@@ -20,6 +22,7 @@ func main() {
 
 	seTemplate(e)
 	setJson(e)
+	setupDB()
 
 	// host情報を削るとwindowsのセキュリティアラートが毎回出る
 	e.Logger.Fatal(e.Start("localhost:1323"))
@@ -95,4 +98,11 @@ func setJson(e *echo.Echo) {
 		// response json
 		return c.JSON(http.StatusOK, params)
 	})
+}
+
+
+// setupDB
+func setupDB() {
+	// httpとは関係ないところでmigrate
+	models.AutoMigrate()
 }
