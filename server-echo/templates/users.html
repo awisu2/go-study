@@ -1,6 +1,50 @@
 {{define "users"}}
 <h2>users</h2>
+<a href="/users/create">create</a>
+
+<table>
+  <tr>
+    <td>id</td>
+    <td>userId</td>
+    <td>name</td>
+    <td>createdAt</td>
+    <td>updatedAt</td>
+    <td>deletedAt</td>
+  </tr>
+  {{range $k, $v := .Data.Users}}
+  <tr>
+    <td>{{$v.ID}}</td>
+    <td>{{$v.UserId}}</td>
+    <td>{{$v.Name}}</td>
+    <td>{{$v.CreatedAt}}</td>
+    <td>{{$v.UpdatedAt}}</td>
+    <td>{{$v.DeletedAt}}</td>
+  </tr>
+  {{end}}
+</table>
+{{end}}
+
+{{define "usersCreate"}}
+<h2>users</h2>
+<form action="/users" method="POST">
+  <table>
+    <tr>
+      <td>userId</td>
+      <td><input type="text" name="userId" value=""></td>
+    </tr>
+    <tr>
+      <td>name</td>
+      <td><input type="text" name="name" value=""></td>
+    </tr>
+  </table>
+  <button>create</button>
+</form>
+{{end}}
+
+{{define "usersDetail"}}
+<h2>users</h2>
 <ul>
   <li>name: {{.}}</li>
 </ul>
 {{end}}
+

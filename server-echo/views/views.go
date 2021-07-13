@@ -7,6 +7,7 @@ import (
 	"github.com/labstack/echo/v4"
 )
 
+// 一定の引数を強制
 type TemplateData struct {
 	BodyTemplate string
 	Data interface{}
