@@ -12,7 +12,7 @@ type TemplateData struct {
 	Data interface{}
 }
 
-func renderTemplate(c echo.Context, data TemplateData) error {
+func renderTemplate(c echo.Context, data *TemplateData) error {
 	err := c.Render(http.StatusOK, "template", data)
 	if err != nil {
 		log.Println(err)

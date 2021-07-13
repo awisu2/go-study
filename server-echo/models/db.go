@@ -61,7 +61,3 @@ func openPostgresql() *gorm.DB{
 	}
 }
 
-func AutoMigrate() {
-  db := Open()
-  db.DB.AutoMigrate(&Product{}, &User{})
-}
