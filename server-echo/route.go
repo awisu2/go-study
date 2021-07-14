@@ -13,11 +13,12 @@ func Routing(e *echo.Echo) {
 
 	// root
 	e.GET("/", func(c echo.Context) error {
-		return c.String(http.StatusOK, "Hello, wsl Echo World!")
+		return c.String(http.StatusOK, "Hello, Echo World! go to /users.")
 	})
 
 	routingView(e)
 	routingApi(e)
+	routingWebsocket(e)
 }
 
 func routingView(e *echo.Echo) {
@@ -35,6 +36,12 @@ func routingView(e *echo.Echo) {
 		g.POST("", views.UsersCreatePost)
 	}
 
+		// user
+		{
+			g := g.Group("/websocket")
+			g.GET("", views.WebsocketView)
+		}
+	
 	// // route list
 	// e.GET("routes", func(c echo.Context) error {
 	// 	if data, err := json.MarshalIndent(e.Routes(), "", " "); err == nil {
@@ -73,4 +80,12 @@ func routingApi(e *echo.Echo) {
 				return err
 		}
 	})
+}
+
+func routingWebsocket(e *echo.Echo) {
+	g := e.Group("/ws")
+	
+	{
+		g.GET("", views.HelloWebsocket)
+	}
 }

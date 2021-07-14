@@ -33,6 +33,19 @@ func sampleHello() {
 		log.Println(err)
 	}
 	log.Println(out2)
+
+	// mapでざっくり受け取る、上記の空インタフェースよりはkeyがわかるので少しマシ？
+	var out3 map[string]interface{}
+	d := json.NewDecoder(bytes.NewReader(message))
+	// Unmarshalとの違いとして、decode前にカスタムできる
+	d.DisallowUnknownFields()
+	if err := d.Decode(&out3); err != nil {
+		log.Println(err)
+	}
+	log.Println(out3)
+	for k, v := range out3 {
+		log.Printf("%s: %v\n", k, v)
+	}
 }
 
 // escape html for json
