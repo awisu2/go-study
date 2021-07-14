@@ -1,7 +1,7 @@
 package views
 
 import (
-	"go-study/server-echo/libs"
+	"go-study/server-echo/libs/websocket"
 	"go-study/server-echo/models"
 	"log"
 
@@ -9,7 +9,7 @@ import (
 )
 
 func HelloWebsocket(c echo.Context) error {
-	return libs.ConnectWebSocket(c)
+	return websocket.ConnectWebSocket(c)
 }
 
 func WebsocketView(c echo.Context) error {

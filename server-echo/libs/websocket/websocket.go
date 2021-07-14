@@ -1,4 +1,4 @@
-package libs
+package websocket
 
 import (
 	"log"
@@ -8,14 +8,27 @@ import (
 )
 
 
-var (
-	upgrader = websocket.Upgrader{}
-)
-
-func ConnectWebSocket(c echo.Context) error {
-	return connectWebSocketGorilla(c)
+var upgrader = websocket.Upgrader{
+	ReadBufferSize:  1024,
+	WriteBufferSize: 1024,
 }
 
+var instanceHub *Hub
+
+func GetHub() *Hub  {
+	if instanceHub == nil {
+		instanceHub = NewHub()
+		go instanceHub.run()
+	}
+	return instanceHub
+}
+
+func ConnectWebSocket(c echo.Context) error {
+	// return connectWebSocketGorilla(c)
+	return ServeWs(GetHub(), c.Response(), c.Request())
+}
+
+// シンプルにgorillaWebsocketに接続
 func connectWebSocketGorilla(c echo.Context) error {
 	ws, err := upgrader.Upgrade(c.Response(), c.Request(), nil)
 	if err != nil {
@@ -36,7 +49,6 @@ func connectWebSocketGorilla(c echo.Context) error {
 		}
 		log.Println(msg)
 	}
-
 }
 
 // netに付属のwebsocketでの接続

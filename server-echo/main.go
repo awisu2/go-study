@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 
+	"go-study/server-echo/libs/websocket"
 	"go-study/server-echo/models"
 
 	"github.com/labstack/echo/v4"
@@ -22,6 +23,7 @@ func main() {
 	seTemplate(e)
 	setJson(e)
 	setupDB()
+	setWebSocket()
 
 	// host情報を削るとwindowsのセキュリティアラートが毎回出る
 	e.Logger.Fatal(e.Start("localhost:1323"))
@@ -145,5 +147,10 @@ func setJson(e *echo.Echo) {
 func setupDB() {
 	// httpとは関係ないところでmigrate
 	models.AutoMigrate()
+}
+
+// websocket
+func setWebSocket() {
+	websocket.GetHub()
 }
 
