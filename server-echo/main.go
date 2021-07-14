@@ -141,9 +141,9 @@ func setJson(e *echo.Echo) {
 	})
 }
 
-
 // setupDB
 func setupDB() {
 	// httpとは関係ないところでmigrate
 	models.AutoMigrate()
 }
+
