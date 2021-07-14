@@ -30,8 +30,21 @@
     <title>Document</title>
   </head>
   <body>
-    {{dynamicTemplate .BodyTemplate .}}
+    <h1>server-echo</h1>
+    {{template "header" .}}
+
+    {{if ne .Message ""}}
+    <p>{{.Message}}</p>
+    {{end}}
+
+    {{dynamicTemplate .Body .}}
   </body>
   </html>
+{{end}}
+
+{{define "header"}}
+<div>
+  <a href="/users">users</a>
+</div>
 {{end}}
 

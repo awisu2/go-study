@@ -27,10 +27,10 @@ func routingView(e *echo.Echo) {
 	{
 		g := g.Group("/users")
 		g.GET("", views.UsersList)
-		g.GET("/create", views.UsersCreate)
+		g.GET("/create", views.UsersSave)
 		g.GET("/:id", views.UsersDetail)
-		// g.PUT("/:id", views.UpdateUser)
-		// g.DELETE("/:id", views.DeleteUser)
+		g.GET("/:id/update", views.UsersSave)
+		g.GET("/:id/delete", views.UsersDeletePost)
 
 		g.POST("", views.UsersCreatePost)
 	}

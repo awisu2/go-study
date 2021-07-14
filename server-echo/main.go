@@ -16,17 +16,21 @@ import (
 func main() {
 	e := echo.New()
 
-	// static file setting(access, server directory)
-	e.Static("/assets", "assets")
-
 	Routing(e)
 
+	setStatic(e)
 	seTemplate(e)
 	setJson(e)
 	setupDB()
 
 	// host情報を削るとwindowsのセキュリティアラートが毎回出る
 	e.Logger.Fatal(e.Start("localhost:1323"))
+}
+
+// static settings
+func setStatic(e *echo.Echo) {
+	// static file setting(access, server directory)
+	e.Static("/assets", "assets")
 }
 
 // template setting

@@ -9,11 +9,16 @@ import (
 
 // 一定の引数を強制
 type TemplateData struct {
-	BodyTemplate string
+	Body string
 	Data interface{}
+	Message string
 }
 
 func renderTemplate(c echo.Context, data *TemplateData) error {
+	if data.Message == "" {
+		data.Message = c.FormValue("message")
+	}
+
 	err := c.Render(http.StatusOK, "template", data)
 	if err != nil {
 		log.Println(err)
