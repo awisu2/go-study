@@ -1,0 +1,79 @@
+{{define "users"}}
+<h2>users</h2>
+<a href="/users/create">create</a>
+
+<table>
+  <tr>
+    <td>id</td>
+    <td>userId</td>
+    <td>name</td>
+    <td>createdAt</td>
+    <td>updatedAt</td>
+    <td>deletedAt</td>
+  </tr>
+  {{range $k, $v := .Data.Users}}
+  <tr>
+    <td><a href="/users/{{$v.ID}}">{{$v.ID}}</a></td>
+    <td>{{$v.UserId}}</td>
+    <td>{{$v.Name}}</td>
+    <td>{{$v.CreatedAt}}</td>
+    <td>{{$v.UpdatedAt}}</td>
+    <td>{{$v.DeletedAt}}</td>
+  </tr>
+  {{end}}
+</table>
+{{end}}
+
+{{define "usersCreate"}}
+<h2>users</h2>
+<form action="/users" method="POST">
+  <table>
+    <tr>
+      <td>userId</td>
+      <td><input type="text" name="userId" value="{{.Data.User.UserId}}"></td>
+    </tr>
+    <tr>
+      <td>name</td>
+      <td><input type="text" name="name" value="{{.Data.User.Name}}"></td>
+    </tr>
+  </table>
+  <input type="hidden" name="id" value="{{.Data.User.ID}}">
+
+  <button>create</button>
+</form>
+{{end}}
+
+{{define "usersDetail"}}
+<h2>users</h2>
+<table>
+  <tr>
+    <td>id</td>
+    <td>{{.Data.User.ID}}</td>
+  </tr>
+  <tr>
+    <td>userId</td>
+    <td>{{.Data.User.UserId}}</td>
+  </tr>
+  <tr>
+    <td>name</td>
+    <td>{{.Data.User.Name}}</td>
+  </tr>
+  <tr>
+    <td>createdAt</td>
+    <td>{{.Data.User.CreatedAt}}</td>
+  </tr>
+  <tr>
+    <td>updatedAt</td>
+    <td>{{.Data.User.UpdatedAt}}</td>
+  </tr>
+  <tr>
+    <td>deletedAt</td>
+    <td>{{.Data.User.DeletedAt}}</td>
+  </tr>
+</table>
+
+<a href="/users/{{.Data.User.ID}}/update">更新</a>
+<a href="/users/{{.Data.User.ID}}/delete">削除</a>
+<a href="/users">戻る</a>
+{{end}}
+

@@ -1,7 +1,7 @@
-package controllers
+package apis
 
 import (
-	"go-study/server-echo/db"
+	"go-study/server-echo/models"
 	"log"
 	"net/http"
 
@@ -22,7 +22,7 @@ func GetsUser(c echo.Context) error {
 	// _db := OpenSQLiteConnection()
 	// defer _db.Close()
 
-	db.TryDB()
+	models.TryDB()
 
 
 

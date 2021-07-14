@@ -1,0 +1,50 @@
+{{define "template01"}}
+  i am template
+{{end}}
+
+{{define "template02"}}
+  <!DOCTYPE html>
+  <html lang="jp">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+  </head>
+  <body>
+    {{template "page1" .}}
+    {{template "user" .User}}
+  </body>
+  </html>
+{{end}}
+
+{{define "template"}}
+  <!DOCTYPE html>
+  <html lang="jp">
+  <head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="/assets/favicon.ico">
+    <link rel="stylesheet" type="text/css" href="/assets/style/style.css">
+    <title>Document</title>
+  </head>
+  <body>
+    <h1>server-echo</h1>
+    {{template "header" .}}
+
+    {{if ne .Message ""}}
+    <p>{{.Message}}</p>
+    {{end}}
+
+    {{dynamicTemplate .Body .}}
+  </body>
+  </html>
+{{end}}
+
+{{define "header"}}
+<div>
+  <a href="/users">users</a>
+</div>
+{{end}}
+

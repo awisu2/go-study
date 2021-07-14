@@ -1,4 +1,4 @@
-package db
+package models
 
 import "gorm.io/gorm"
 
@@ -15,3 +15,7 @@ type User struct {
   Name string
 }
 
+func AutoMigrate() {
+  db := Open()
+  db.DB.AutoMigrate(&Product{}, &User{})
+}

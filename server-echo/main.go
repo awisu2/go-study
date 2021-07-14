@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
 	"html/template"
 	"io"
 	"log"
 	"net/http"
+
+	"go-study/server-echo/models"
 
 	"github.com/labstack/echo/v4"
 )
@@ -13,19 +16,27 @@ import (
 func main() {
 	e := echo.New()
 
-	// static file setting(access, server directory)
-	e.Static("/", "assets")
-
 	Routing(e)
 
+	setStatic(e)
 	seTemplate(e)
 	setJson(e)
+	setupDB()
 
 	// host情報を削るとwindowsのセキュリティアラートが毎回出る
 	e.Logger.Fatal(e.Start("localhost:1323"))
 }
 
+// static settings
+func setStatic(e *echo.Echo) {
+	// static file setting(access, server directory)
+	e.Static("/assets", "assets")
+}
+
 // template setting
+//
+// [template · pkg.go.dev](https://pkg.go.dev/text/template#Must)
+//
 type Template struct {
 	templates *template.Template
 }
@@ -39,10 +50,20 @@ type User struct {
 }
 
 func seTemplate(e *echo.Echo) {
+	// template.New: 指定されたnameでユニークに allocates する
+	tpl := template.New("base")
+	customFuncs := createCustomFuntion(tpl)
+
 	// Render にtemplateをセット
 	t := &Template{
 		// ここで指定したファイル群がキャッシュされる。
-		templates: template.Must(template.ParseGlob("assets/templates/*.html")),
+		// template.Must: 生成したテンプレートインスタンスを受け取り、第2引数のerrが != nil のときpnic
+		// template.Funcs: 拡張関数の割当 (Parseより前にセットする必要あり)
+		// template.ParseGlob: パターンにより対象ファイルからテンプレート情報を生成する
+		templates: template.Must(
+			tpl.
+				Funcs(customFuncs).
+				ParseGlob("templates/*.html")),
 	}
 	e.Renderer = t
 
@@ -73,6 +94,29 @@ func seTemplate(e *echo.Echo) {
 	})
 }
 
+// template用 拡張関数
+func createCustomFuntion(t *template.Template) map[string]interface{} {
+	// template用 拡張関数
+	return map[string]interface{} {
+		"hello": func () string {
+			return "hello world!"
+		},
+		// 第一引数にテンプレート名を指定することで、引数からでもtemplateを実行する
+		//
+		// default の {{template}} では name に変数を割り当てることができず、header, footerを毎回記述する必要がありそうなため追加
+		//
+		"dynamicTemplate": func(name string, data interface{}) (template.HTML, error) {
+				buf := bytes.NewBuffer([]byte{})
+				err := t.ExecuteTemplate(buf, name, data)
+				if err != nil {
+					return "", err
+				}
+				html := template.HTML(buf.String())
+				return html, nil
+		},		
+	}	
+}
+
 // json get/response
 type JsonParams struct {
 	Id string `json:"id"`
@@ -95,4 +139,11 @@ func setJson(e *echo.Echo) {
 		// response json
 		return c.JSON(http.StatusOK, params)
 	})
+}
+
+
+// setupDB
+func setupDB() {
+	// httpとは関係ないところでmigrate
+	models.AutoMigrate()
 }
