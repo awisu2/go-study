@@ -32,7 +32,10 @@ func GetsUser(c echo.Context) error {
 func GetUser(c echo.Context) error {
 	// User ID from path `users/:id`
 	id := c.Param("id")
-	return c.String(http.StatusOK, id)
+	var user models.User
+	// Unscoped(): 削除済みレコードも対象にする
+	models.Open().DB.Unscoped().First(&user, id)
+	return c.JSON(http.StatusOK, &user)
 }
 
 func UpdateUser(c echo.Context) error {

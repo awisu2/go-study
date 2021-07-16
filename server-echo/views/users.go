@@ -45,7 +45,7 @@ func UsersDetail(c echo.Context) error {
 }
 
 func UsersSave(c echo.Context) error {
-	// formからの値を取得
+	// パスからの値を取得
 	id := c.Param("id")
 	var user models.User
 	if id != "" {
