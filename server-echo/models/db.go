@@ -37,11 +37,12 @@ func OpenByKey(key string) Database {
 func openDB(kind string) *gorm.DB {
   log.Println("open DB. " + kind)
 
-  if kind == "postgresql" {
-    return openPostgresql()
-  } else {
-    return openSqlite()
-  }
+  // if kind == "postgresql" {
+  //   return openPostgresql()
+  // } else {
+  //   return openSqlite()
+  // }
+  return openPostgresql()
 }
 
 func openSqlite() *gorm.DB{
