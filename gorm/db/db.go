@@ -31,7 +31,7 @@ func open(dialector gorm.Dialector) *gorm.DB{
 }
 
 func AutoMigrate(db *gorm.DB) {
-  db.AutoMigrate(&Product{}, &User{}, &RBase{}, &RParent{}, &ROne{})
+  db.AutoMigrate(&Product{}, &User{}, &ROnetooneBase{}, &ROnetooneItem{}, &RHasmanyBase{}, &RHasmanyItem{}, &RMtomBase{}, &RMtomItem{})
 }
 
 func CreateGormConfig() *gorm.Config {

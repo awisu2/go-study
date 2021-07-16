@@ -17,31 +17,46 @@ type User struct {
 }
 
 
-type RBase struct {
+type ROnetooneBase struct {
   ID        uint           `gorm:"primaryKey"`
-  // belongs to (キーとセットで記述 defaultだと名前＋ID)
-  //
-  // DBにカラムは生成されない
-  //
-  RParent    RParent
-  RParentID  uint
-  //
-  // 外部キーを変えたい場合
-  // RParent    RParent `gorm:"foreignKey:RParentRefer"`
-  // RParentRefer  uint
-  //
-  // 関連するキー対象を変えたい場合(相手のキーはuniqueであること)
-  // RParent    RParent `gorm:"references:SubID"`
+
+  // one to one
+  // ROneのカラムは作成されない
+  ROnetooneItem      ROnetooneItem `gorm:"constraint:OnUpdate:CASCADE,OnDelete:SET NULL;"`
 }
 
-type RParent struct {
+type ROnetooneItem struct {
   ID        uint           `gorm:"primaryKey"`
-  SubID     uint           `gorm:"unique"`
+  // RBaseのROneと連動(default: テーブル名+ID)
+  ROnetooneBaseID   uint
+  Name string `gorm:"required"`
 }
 
+type RHasmanyBase struct {
+  ID  uint `gorm:"primaryKey"`
+  Num int
+  RHasmanyItems []RHasmanyItem
+}
 
+type RHasmanyItem struct {
+  ID  uint `gorm:"primaryKey"`
+  Num int
+  RHasmanyBaseID uint
+}
 
-type ROne struct {
-  ID        uint           `gorm:"primaryKey"`
-  
+// many to many
+// https://gorm.io/ja_JP/docs/many_to_many.html
+//
+// この場合 r_mtom_base_r_mtom_items という中間テーブルが作成される
+// (中間テーブルはmany2manyの指定に準拠)
+type RMtomBase struct {
+  ID  uint `gorm:"primaryKey"`
+  Num int
+  RMtomItems []*RMtomItem `gorm:"many2many:RMtomBase_RMtomItems;"`
+}
+
+type RMtomItem struct {
+  ID  uint `gorm:"primaryKey"`
+  Num int
+  RMtomBases []*RMtomBase  `gorm:"many2many:RMtomBase_RMtomItems;"`
 }
