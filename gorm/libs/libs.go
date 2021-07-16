@@ -19,4 +19,3 @@ func CreateRandomString(digit uint32, letters string) (string, error) {
 
 	return s, nil
 }
-
