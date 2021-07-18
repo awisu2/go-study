@@ -68,7 +68,18 @@ class App extends React.Component {
       return
     }
 
-    this.state.conn.send(JSON.stringify({message: this.state.message}))
+    this.state.conn.send(JSON.stringify({
+      message: this.state.message,
+      foo: {
+        a: "-a",
+        // b: "-b",
+        c: "-c",
+        d: {
+          x: "-ad",
+          y: "-ad",
+        }
+      },
+    }))
   }
 
   render() {
