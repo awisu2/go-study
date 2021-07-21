@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 
+	"go-study/server-echo/libs"
 	"go-study/server-echo/libs/websocket"
 	"go-study/server-echo/models"
 
@@ -145,6 +146,7 @@ func setJson(e *echo.Echo) {
 
 // setupDB
 func setupDB() {
+	models.SetConfigs(libs.DbConfigs)
 	// httpとは関係ないところでmigrate
 	models.AutoMigrate()
 }
