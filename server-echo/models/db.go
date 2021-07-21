@@ -8,11 +8,27 @@ import (
 	"gorm.io/gorm"
 )
 
-// 一度開いたDBを保管
-var instanceDBs map[string]Database = map[string]Database{}
-
 type Database struct {
   DB *gorm.DB
+}
+
+type DbKind string
+const (
+  DB_KIND_SQLITE = DbKind("sqlite")
+  DB_KIND_POSTGRESQL = DbKind("postgresql")
+)
+type Config struct {
+  Key string
+  Kind DbKind
+}
+
+type Configs map[string]Config
+
+var _configs Configs
+var instanceDBs map[string]Database = map[string]Database{}
+
+func SetConfigs(configs Configs)  {
+  _configs = configs
 }
 
 func Open() Database {
@@ -25,7 +41,8 @@ func OpenByKey(key string) Database {
 
   // db open
   if !ok {
-    db := openDB("sqlite")
+    config := _configs[key]
+    db := openDB(config.Kind)
     database = Database{DB: db}
     instanceDBs[key] = database
   }
@@ -34,15 +51,15 @@ func OpenByKey(key string) Database {
 }
 
 // 実際にDBを開く処理
-func openDB(kind string) *gorm.DB {
+func openDB(kind DbKind) *gorm.DB {
   log.Println("open DB. " + kind)
 
-  // if kind == "postgresql" {
-  //   return openPostgresql()
-  // } else {
-  //   return openSqlite()
-  // }
-  return openPostgresql()
+  switch kind {
+  case "postgresql":
+    return openPostgresql()
+  default:
+    return openSqlite()
+  }
 }
 
 func openSqlite() *gorm.DB{

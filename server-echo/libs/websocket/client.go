@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/gorilla/websocket"
+	"github.com/mitchellh/mapstructure"
 )
 
 const (
@@ -43,6 +44,18 @@ type Client struct {
 	send chan []byte
 }
 
+
+type Foo struct {
+	A string `json:"a"`
+	B string `json:"b"`
+	D map[string]interface{} `json:"d"`
+}
+
+type Point struct {
+	X string `json:"x"`
+	Y string `json:"y"`
+}
+
 // readPump pumps messages from the websocket connection to the hub.
 //
 // The application runs readPump in a per-connection goroutine. The application
@@ -62,8 +75,9 @@ func (c *Client) readPump() {
 	for {
 		// メッセージの到着を待機かつReadJSONでjsonを取得
 		// [websocket/json.go at master · gorilla/websocket](https://github.com/gorilla/websocket/blob/master/json.go)
+
+		// type などの値を受け取って処理を分けたいのでまずはmapで取得
 		var message map[string]interface{}
-		// _, message, err := c.conn.ReadMessage()
 		err := c.conn.ReadJSON(&message)
 		if err != nil {
 			// 予想外のエラー
@@ -78,9 +92,23 @@ func (c *Client) readPump() {
 			break
 		}
 
-		for k, v := range message {
-			log.Printf("%s: %v", k, v)
+		// 処理分岐のための、map to struct サンプル
+		// map to struct 型違いでもなければ基本errorにはならない(nilを渡してもデフォルト値になるだけ)
+		var foo Foo
+		err = mapstructure.Decode(message["foo"], &foo)
+		if err == nil {
+			log.Println(foo)
+		} else {
+			log.Println(err)
+			var point Point
+			err = mapstructure.Decode(foo.D, &point)
+			if err != nil {
+				log.Println(err)
+			} else {
+				log.Println(point)
+			}
 		}
+
 
 		// INFO: メッセージに合わせて何らかの処理
 		// message = bytes.TrimSpace(bytes.Replace(message, newline, space, -1))
