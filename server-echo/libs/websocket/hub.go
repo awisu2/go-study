@@ -4,6 +4,11 @@
 
 package websocket
 
+import (
+	"log"
+	"time"
+)
+
 type BroadCast struct {
 	message []byte
 	outClient *Client
@@ -35,6 +40,7 @@ func NewHub() *Hub {
 }
 
 func (h *Hub) run() {
+	ticker := time.NewTicker(time.Second * 10)
 	for {
 		select {
 		case client := <-h.register:
@@ -59,6 +65,11 @@ func (h *Hub) run() {
 					close(client.send)
 				}
 			}
+		case <-ticker.C:
+			log.Println("interval")
+			// 再起動
+			// ticker.Stop()
+			// ticker.Reset(time.Second * 1)
 		}
 	}
 }
