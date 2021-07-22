@@ -4,7 +4,7 @@ import (
 	"log"
 	"net/http"
 
-	"go-study/server-echo/models"
+	"go-study/server-echo/dbs"
 
 	"github.com/labstack/echo/v4"
 )
@@ -12,13 +12,13 @@ import (
 func UsersList(c echo.Context) error {
 	log.Println("UsersList")
 
-	var users []*models.User
+	var users []*dbs.User
 	// データが無くても配列が返却される
 	// Unscopedで削除フラグがたっているレコードも取得
-	models.Open().DB.Unscoped().Find(&users)
+	dbs.Open("").DB.Unscoped().Find(&users)
 
 	return renderTemplate(c, &TemplateData{Body: "users", Data: &struct{
-		Users []*models.User
+		Users []*dbs.User
 	} {
 		users,
 	}})
@@ -34,11 +34,11 @@ func UsersDetail(c echo.Context) error {
 		return renderTemplate(c, &TemplateData{Body: "usersDetail"})
 	}
 
-	var user models.User
-	models.Open().DB.First(&user, id)
+	var user dbs.User
+	dbs.Open("").DB.First(&user, id)
 
 	return renderTemplate(c, &TemplateData{Body: "usersDetail", Data: &struct{
-		User *models.User
+		User *dbs.User
 	} {
 		&user,
 	}})
@@ -47,14 +47,14 @@ func UsersDetail(c echo.Context) error {
 func UsersSave(c echo.Context) error {
 	// パスからの値を取得
 	id := c.Param("id")
-	var user models.User
+	var user dbs.User
 	if id != "" {
-		models.Open().DB.First(&user, id)
+		dbs.Open("").DB.First(&user, id)
 	}
 
 	log.Println("UsersCreate")
 	return renderTemplate(c, &TemplateData{Body: "usersCreate", Data: struct{
-		User models.User
+		User dbs.User
 	}{
 		user,
 	}})
@@ -69,17 +69,17 @@ func UsersCreatePost(c echo.Context) error {
 	name := c.FormValue("name")
 
 	// 更新パラメータの用意
-	user := models.User{
+	user := dbs.User{
 		UserId: userId,
 		Name: name,
 	}
 
 	// save
-	db := models.Open()
+	db := dbs.Open("")
 	if id == "" || id == "0" {
 		db.DB.Create(&user)
 	} else {
-		var _user models.User
+		var _user dbs.User
 		db.DB.First(&_user, id)
 		db.DB.Model(&_user).Updates(user)
 	}
@@ -96,9 +96,9 @@ func UsersDeletePost(c echo.Context) error {
 	// formからの値を取得
 	id := c.Param("id")
 	if id != "" {
-		db := models.Open()
+		db := dbs.Open("")
 		// struct を指定すると全件削除になるとのこと
-		db.DB.Delete(&models.User{}, "Id = ?", id)
+		db.DB.Delete(&dbs.User{}, "Id = ?", id)
 	}
 
 	err := c.Redirect(http.StatusMovedPermanently, "/users?message=削除しました")

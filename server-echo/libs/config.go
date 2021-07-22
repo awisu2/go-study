@@ -1,12 +1,12 @@
 package libs
 
 import (
-	"go-study/server-echo/models"
+	"go-study/server-echo/dbs"
 )
 
-var DbConfigs = models.Configs{
+var DbConfigs = dbs.Configs{
 	"defalt": {
 		Key: "default",
-		Kind: models.DB_KIND_SQLITE,
+		Kind: dbs.DB_KIND_SQLITE,
 	},
 }

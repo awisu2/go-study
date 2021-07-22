@@ -8,9 +8,9 @@ import (
 	"log"
 	"net/http"
 
+	"go-study/server-echo/dbs"
 	"go-study/server-echo/libs"
 	"go-study/server-echo/libs/websocket"
-	"go-study/server-echo/models"
 
 	"github.com/labstack/echo/v4"
 )
@@ -146,13 +146,18 @@ func setJson(e *echo.Echo) {
 
 // setupDB
 func setupDB() {
-	models.SetConfigs(libs.DbConfigs)
+	// Init
+	dbs.Init(libs.DbConfigs)
 	// httpとは関係ないところでmigrate
-	models.AutoMigrate()
+	dbs.AutoMigrate()
 }
 
 // websocket
+//
+// websocketの動作はサーバへの接続時そのconnection情報を利用してwebsocketへの接続を確立しているため、単に接続するだけなら特に事前準備は無い
+//
 func setWebSocket() {
+	// 複数の接続を管理するhubのinstanceを生成(これも新規接続時に作れるなら、ここで作成する必要はない)
 	websocket.GetHub()
 }
 

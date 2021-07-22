@@ -1,4 +1,4 @@
-package models
+package dbs
 
 import (
 	"log"
@@ -8,6 +8,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// 直にgorm.DBを返却してもよいが、追加のパラメータが必要になる場合に備えてstructで管理
 type Database struct {
   DB *gorm.DB
 }
@@ -17,6 +18,7 @@ const (
   DB_KIND_SQLITE = DbKind("sqlite")
   DB_KIND_POSTGRESQL = DbKind("postgresql")
 )
+
 type Config struct {
   Key string
   Kind DbKind
@@ -24,27 +26,28 @@ type Config struct {
 
 type Configs map[string]Config
 
-var _configs Configs
-var instanceDBs map[string]Database = map[string]Database{}
+const KEY_DEFAULT = "default"
 
-func SetConfigs(configs Configs)  {
+var _configs Configs
+var _databases map[string]Database = map[string]Database{}
+
+// 外部からセットしてもらうことでcycleimport及び、隔離性を確保
+func Init(configs Configs)  {
   _configs = configs
 }
 
-func Open() Database {
-  key := "default"
-  return OpenByKey(key)
-}
-
-func OpenByKey(key string) Database {
-  database, ok := instanceDBs[key]
+func Open(key string) Database {
+  if key == "" {
+    key = KEY_DEFAULT
+  }
+  database, ok := _databases[key]
 
   // db open
   if !ok {
     config := _configs[key]
     db := openDB(config.Kind)
     database = Database{DB: db}
-    instanceDBs[key] = database
+    _databases[key] = database
   }
 
   return database

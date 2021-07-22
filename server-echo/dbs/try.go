@@ -1,7 +1,7 @@
-package models
+package dbs
 
 func TryDB() {
-	db := Open()
+	db := Open("")
 
   // Migrate the schema
   db.DB.AutoMigrate(&Product{}, &User{})

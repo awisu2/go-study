@@ -1,10 +1,16 @@
-package models
+package dbs
 
 import (
 	"time"
 
 	"gorm.io/gorm"
 )
+
+// テーブルの宣言は一箇所にまとめて管理
+func AutoMigrate() {
+  db := Open("")
+  db.DB.AutoMigrate(&Product{}, &User{})
+}
 
 // gorm.Modelの拡張
 // jsonレスポンスの設定ができないため、明示する
@@ -29,7 +35,3 @@ type User struct {
   Name string   `json:"name"`
 }
 
-func AutoMigrate() {
-  db := Open()
-  db.DB.AutoMigrate(&Product{}, &User{})
-}

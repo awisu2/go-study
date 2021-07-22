@@ -1,7 +1,7 @@
 package apis
 
 import (
-	"go-study/server-echo/models"
+	"go-study/server-echo/dbs"
 	"log"
 	"net/http"
 
@@ -22,7 +22,7 @@ func GetsUser(c echo.Context) error {
 	// _db := OpenSQLiteConnection()
 	// defer _db.Close()
 
-	models.TryDB()
+	dbs.TryDB()
 
 
 
@@ -32,9 +32,9 @@ func GetsUser(c echo.Context) error {
 func GetUser(c echo.Context) error {
 	// User ID from path `users/:id`
 	id := c.Param("id")
-	var user models.User
+	var user dbs.User
 	// Unscoped(): 削除済みレコードも対象にする
-	models.Open().DB.Unscoped().First(&user, id)
+	dbs.Open("").DB.Unscoped().First(&user, id)
 	return c.JSON(http.StatusOK, &user)
 }
 

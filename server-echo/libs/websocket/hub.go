@@ -65,6 +65,8 @@ func (h *Hub) run() {
 					close(client.send)
 				}
 			}
+
+		// 一定時間ごとに何らかの処理を行う
 		case <-ticker.C:
 			log.Println("interval")
 			// 再起動
