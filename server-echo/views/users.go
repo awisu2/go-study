@@ -1,12 +1,16 @@
 package views
 
 import (
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 
 	"go-study/server-echo/dbs"
+	"go-study/server-echo/libs"
 
 	"github.com/labstack/echo/v4"
+	"github.com/mitchellh/mapstructure"
 )
 
 func UsersList(c echo.Context) error {
@@ -60,32 +64,50 @@ func UsersSave(c echo.Context) error {
 	}})
 }
 
+type AnyMap map[string]interface{}
+
 func UsersCreatePost(c echo.Context) error {
 	log.Println("UsersCreatePost")
 
 	// formからの値を取得
-	id := c.FormValue("id")
-	userId := c.FormValue("userId")
-	name := c.FormValue("name")
+	data := AnyMap{}
+	c.Bind(&data)
 
-	// 更新パラメータの用意
-	user := dbs.User{
-		UserId: userId,
-		Name: name,
+	accessedAt, _ := data["accessedAt"].(string)
+
+	t, _ := libs.StrToTime(accessedAt)
+	data["accessedAt"] = t
+	fmt.Println(t)
+
+	id, idOk := data["id"].(string)
+
+	var user dbs.User
+	err := mapstructure.Decode(data, &user)
+	if err != nil {
+		fmt.Println(err)
+		return renderTemplate(c, &TemplateData{Body: "usersCreate", Data: struct{
+			User dbs.User
+		}{
+			user,
+		}, })
 	}
+	fmt.Println(user)
 
 	// save
 	db := dbs.Open("")
-	if id == "" || id == "0" {
-		db.DB.Create(&user)
-	} else {
+	if idOk && id != "0" {
 		var _user dbs.User
+		fmt.Println("!!!update")
 		db.DB.First(&_user, id)
 		db.DB.Model(&_user).Updates(user)
+	} else {
+		mapstructure.Decode(data, &user)
+		user.AccessedAt = time.Now()
+		db.DB.Create(&user)
 	}
 
 	// リダイレクト
-	err := c.Redirect(http.StatusMovedPermanently, "/users?message=追加しました")
+	err = c.Redirect(http.StatusMovedPermanently, "/users?message=追加しました")
 	if err != nil {
 		log.Fatal(err)
 	}

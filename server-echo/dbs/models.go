@@ -33,5 +33,6 @@ type User struct {
   GormModel
   UserId string `gorm:"unique" json:"userId"`
   Name string   `json:"name"`
+  AccessedAt time.Time
 }
 

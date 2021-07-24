@@ -24,8 +24,6 @@ func GetsUser(c echo.Context) error {
 
 	dbs.TryDB()
 
-
-
 	return c.String(http.StatusOK, "hi!")
 }
 
