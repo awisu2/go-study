@@ -8,6 +8,12 @@ import (
 )
 
 func main() {
+	sampleStrToTime()
+	sampleLocation()
+}
+
+func sampleStrToTime() {
+	fmt.Println("---------- sampleStrToTime")
 	fmt.Println(StrToTime("1234/12/23T12:34:56+09:00")) 
 	fmt.Println(StrToTime("1234/12/23T12:34:56-07:00")) 
 	fmt.Println(StrToTime("1234/12/23T12:34:56+0900")) 
@@ -16,6 +22,9 @@ func main() {
 
 	fmt.Println(StrToTime("  1234/12/23T12:34:56 +09:00  ")) 
 
+	fmt.Println(StrToTime("1234/12/23T12:34:56")) 
+
+
 	fmt.Println(StrToTime("1234/12/23")) 
 	fmt.Println(StrToTime("1234/12")) 
 
@@ -23,6 +32,31 @@ func main() {
 	fmt.Println(StrToTime("12:34")) 
 }
 
+func sampleLocation() {
+	fmt.Println("---------- sampleLocation")
+	t, _ := StrToTime("2000/12/23T12:34:56+09:00")
+	// 1234-12-23 12:34:56 +0900
+	fmt.Println(t)
+
+	// UTCにする
+	// 見た目上の時間はlocationにあわせて調整される
+	// 1234-12-23 03:34:56 +0000 UTC
+	t = t.UTC()
+	fmt.Println(t)
+
+	// 単にlocationを変換
+	// 見た目上の時間は変わらない
+	loc, err := time.LoadLocation("Asia/Tokyo")
+	if err == nil {
+		fmt.Println(t.In(loc))
+		fmt.Println(t)
+	}
+
+	// 自前でlocationを作る というかFixなのでlocationを修正するといったほうが正しそう
+	loc = time.FixedZone("JPT", 9*60*60)
+	fmt.Println(t.In(loc))
+
+}
 
 // 文字列をtimeへ変換
 var zoneRe = regexp.MustCompile(`[+-][0-9:]*$`)
