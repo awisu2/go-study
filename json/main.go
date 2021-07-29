@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"time"
 )
 
 func main() {
@@ -12,6 +13,7 @@ func main() {
 	sampleEscapeHtml()
 	sampleStruct()
 	sampleMap()
+	sampleCustom()
 }
 
 func sampleHello() {
@@ -123,3 +125,37 @@ func sampleMap() {
 	log.Println(out["night"].Word)
 }
 
+// json変換をカスタマイズする
+//
+// https://dena.github.io/codelabs/encodingjson-generator/#0
+type Shop struct {
+	Name string `json:"name"`
+	OpenedAt time.Time `json:"opendAt"`
+}
+
+// 拡張関数を作成しそれを呼び出すパターン
+func (s *Shop) MarshalJson() ([]byte, error) {
+	// subnameを追加
+	return json.Marshal(&struct {
+		Name string `json:"name"`
+		SubName string `json:"subname"`
+		OpendAt time.Time `json:"opendAt"`
+	} {
+		s.Name, "sub" + s.Name, s.OpenedAt,
+	})
+}
+
+func sampleCustom() {
+	shop := Shop{
+		"abc", time.Now(),
+	}
+
+	// {"name":"abc","opendAt":"2021-07-26T09:21:26.157004+09:00"}
+	b, _ := json.Marshal(&shop)
+	log.Println(string(b))
+
+	// {"name":"abc","opendAt":"2021-07-26T09:21:26.157004+09:00"}
+	b, _ = shop.MarshalJson()
+	log.Println(string(b))
+
+}
