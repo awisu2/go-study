@@ -6,9 +6,10 @@ import (
 )
 
 func main() {
-	sampleHello()
-	sampleChannel()
-	sampleChannelLimit()
+	// sampleHello()
+	// sampleChannel()
+	// sampleChannelLimit()
+	samplePingPong()
 }
 
 func sampleHello() {
@@ -86,5 +87,99 @@ func sampleChannelLimit() {
 			return
 		default:
 		}
+	}
+}
+
+
+type PingPong struct {
+	Hit chan int
+	End chan bool
+	Name string
+	IsEnd bool
+}
+
+func (pingPong *PingPong) Lary(partner *PingPong) {
+	defer pingPong.Close()
+
+	for {
+		// 基本的には責任範囲を自身のinstanceにとどめておく
+		select {
+		case v := <- pingPong.Hit:
+			if !pingPong.IsEnd {
+				time.Sleep(time.Second)
+				v += 1
+				fmt.Println(pingPong.Name, ":", v)
+				partner.Hit <- v
+			}
+		case <- pingPong.End:
+			fmt.Println(pingPong.Name, ": end")
+			// 終了処理
+			//
+			// 以下の手順
+			// 1. まずは自分が処理を停止し、相手に通知
+			// 2. 相手はそれを受けて処理を停止し、それを再通知、自身は終了(return)
+			// 3. 自身はすでに停止しているので、終了(return)
+			//
+			// 課題：
+			// channelの停止の前にそれぞれ相手へ送らないことを確定しないと, send closed channelのエラーになる
+			// 思った以上にchannnelのクローズはシビア。フラグをsync.Mutexする程度ではタイミングが合わない
+			// またchannelを閉じないままgoroutineを閉めると、all goroutine asleep エラーになる
+			//
+			// 「selectにより、caseのどれか一つしか動作しないことを利用して終了状態を確定」している(IsEnd)
+			//　私停止しましたを安全に設定できる状態で相互に問題のない状態にしそれぞれ終了を行う
+			//
+			// 今回はpingPongでコンパクトに纏めたかったので相互的な確認にしたが、
+			// 上位の管理structなどを作って管理したほうが、有用なパターンは多いと思われる
+			// ただし、全てを管理struct経由になるため各処理をgoroutineに分けた意味がなくならないように
+			if pingPong.IsEnd {
+				return
+			} else {
+				pingPong.IsEnd = true
+				partner.End <- true
+				if partner.IsEnd {
+					return
+				}
+			}
+		}
+	}
+}
+
+func (pingPong *PingPong) Close() {
+	fmt.Println(pingPong.Name, ": close")
+	close(pingPong.Hit)
+	close(pingPong.End)
+}
+
+func CreatePingPong(name string) *PingPong {
+	// なるべく上限は指定したほうが良さそう
+	// TOOD: ちょっと不明な点が多い
+	// INFO: 両方のchannelを制限掛けずにセットしたらEndへ送信した時点で停止する問題があった
+	// INFO: endのlimitを設定せず、pingPongの回数を多くしたらcloseしなかった(最後の待機時間を多くしてもだめ)
+	// INFO: endのlimitを1に設定したらpingPongの回数を多くしてもcloseした
+	// INFO: hitの方は設定してもしなくても、動作時間などに関係なく、普通に動作した。
+	// INFO: endの型をint/boolと切り替えたがそれによっての動作は変わらなかった
+	hit := make(chan int)
+	end := make(chan bool, 1)
+	return &PingPong {
+		Hit: hit,
+		End: end,
+		Name: name,
+	}
+}
+
+func samplePingPong() {
+	// channel は　makeによって生成可能
+	{
+		ping, pong := CreatePingPong("ping"), CreatePingPong("pong")
+		go ping.Lary(pong)
+		go pong.Lary(ping)
+
+		ping.Hit <- 0
+
+		time.Sleep(time.Second * 5)
+		ping.End <- true
+
+		// 待機しないとerrorログを華麗にスルーしてしまうので待機
+		time.Sleep(time.Second * 3)
 	}
 }

@@ -3,11 +3,13 @@
 自分用 go 勉強リポジトリです
 
 - install: [Download and install - The Go Programming Language](https://golang.org/doc/install)
-- commands: 後述
-  - モジュールを作るとき: `go mod init {domain/module}`
+- commands: 詳細は後述
+  - create mod: `go mod init {domain/module}`
+  - update packages: `go mod tidy`
+  - run mod: `go mod .`
 - packages: [pkg.go.dev](https://pkg.go.dev/)
 - 環境変数(GOPATH, GOROOT, GOBIN...): 後述
-- GOPATH に縛られたくない: 無理。(どうしても必要なら GOPATH の自動切り替え環境を用意)
+- moduleGO PATH GOPATH に縛られたくない: 無理。(どうしても必要なら GOPATH の自動切り替え環境を用意)
 - test: `go test`
   - 命名規則: file: `Xxx_test.go`, func: `TestXxx`
     - ファイル名は何でも良い、func 名が package 内でかぶると (普通に) redeclared error
@@ -30,7 +32,7 @@ module モードにすることで、module のバージョンなどを分離で
 - init: `go mod init {domain/module}`
 - run: `go run .`
 - tidy mod: `go mod tidy`
-  - before write `imoprt` in code
+  - after writed `imoprt` in code
 - edit mod: `go mod edit {command}`
   - replace module path: `go mod edit -replace example.com/greetings=../greetings`
 - build: `go build`
