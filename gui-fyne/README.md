@@ -1,5 +1,13 @@
 # gui-fyne
 
+- commands
+  - create package: `fyne package -os windows -icon cycle.png`
+    - 実行ファイルを作成
+
+## insatll
+
+- fyne コマンドのインストール: `go get fyne.io/fyne/v2/cmd/fyne`
+
 ## getting start
 
 main.go
@@ -21,7 +29,7 @@ func main() {
 	w.SetContent(container.NewVBox(
 		hello,
 		widget.NewButton("Hi!", func() {
-			hello.SetText("Welcome :)")
+			hello.SetText("Welcome :")
 		}),
 	))
 
