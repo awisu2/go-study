@@ -9,6 +9,7 @@ import (
 	"os"
 	"time"
 
+	"fyne.io/fyne/theme"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/canvas"
@@ -51,9 +52,11 @@ func main() {
 	app := config.CreateApp()
 
 	// サブ window を表示
-	showSecond(app)
-	showWidget(app)
-	showCanvas(app)
+	// showSecond(app)
+	// showWidget(app)
+	// showCanvas(app)
+	// showLayouts(app)
+	showTutorials(app)
 
 	// メインwindowを表示
 	content := contentBoxLayout()
@@ -224,4 +227,136 @@ func getImage(path string) (image.Image, error) {
 	}
 
 	return i, nil
+}
+
+func showLayouts(app fyne.App) {
+	config := Config{
+		Title:      "layouts",
+		WindowSize: fyne.NewSize(300, 300),
+	}
+
+	text := canvas.NewText("1", color.Black)
+	text2 := canvas.NewText("2", color.Black)
+
+	// 横並び horizontal box layout
+	// hBox := layout.NewHBoxLayout()
+
+	// 縦並び vertical box layout
+	vBox := layout.NewVBoxLayout()
+	spacer := layout.NewSpacer()
+
+	// grid
+	// container化することで、他のlayoutに混ぜることが可能
+	// 引数は横のカラム数で等間隔にっセットされる
+	grid := container.New(
+		layout.NewGridLayout(3),
+		canvas.NewText("g1", color.Black),
+		canvas.NewText("g2", color.Black),
+		canvas.NewText("g3", color.Black),
+		canvas.NewText("g4", color.Black),
+		canvas.NewText("g5", color.Black),
+		canvas.NewText("g6", color.Black),
+		canvas.NewText("g7", color.Black),
+		canvas.NewText("g8", color.Black),
+	)
+
+	// grid wrap 1ブロックあたりのサイズを指定しそれが収まるようにgrid表示
+	gridWrap := container.New(
+		layout.NewGridWrapLayout(fyne.NewSize(50, 50)),
+		canvas.NewText("g1", color.Black),
+		canvas.NewText("g2", color.Black),
+		canvas.NewText("g3", color.Black),
+		canvas.NewText("g4", color.Black),
+		canvas.NewText("g5", color.Black),
+		canvas.NewText("g6", color.Black),
+		canvas.NewText("g7", color.Black),
+		canvas.NewText("g8", color.Black),
+	)
+
+	// border: midを中心に上下左右にcontentを配置することが可能
+	//
+	// Layout宣言時に、配置するContentObjectを渡す必要がある(サイズ取得のため？)
+	// > 別途、表示するコンテンツは、Container.Newの引数にも渡す必要あり
+	// nilを渡した箇所は、何も表示されない
+	// style と違い, 上下左右の順なので注意
+	mid := canvas.NewText("b_mid", color.Black)
+	top := canvas.NewText("b_top", color.Black)
+	bottom := canvas.NewText("b_bottom", color.Black)
+	left := canvas.NewText("b_left", color.Black)
+	right := canvas.NewText("b_right", color.Black)
+	border := container.New(layout.NewBorderLayout(top, bottom, left, right),
+		top, bottom, left, right, mid)
+
+	// form: いわゆる左に名前、右に入力フォームを設定するとき用のlayout
+	//
+	// 挙動はNewGridLayout(2) に似ているが、カラム幅は左のみ右のみの最大で設定され、高さもそれぞれの行の最大で設定される
+	//
+	form := container.New(layout.NewFormLayout(),
+		canvas.NewText("Label 1", color.Black), canvas.NewText("Value", color.Black),
+		canvas.NewText("Label 2", color.Black), canvas.NewText("Value2", color.Black))
+
+	// center: 中央揃え
+	// TODO: 高さが設定できない
+	centerText := canvas.NewText("center 1", color.Black)
+	center := container.New(layout.NewCenterLayout(), centerText)
+
+	// max: 内部要素をすべてcontainerと同じ高さにする
+	//
+	// 複数要素を指定した場合は上に重なっていく
+	max := container.New(layout.NewMaxLayout(),
+		canvas.NewImageFromResource(theme.FyneLogo()),
+		canvas.NewText("Overlay", color.Black))
+
+	Show(app, container.New(vBox, text, spacer, grid, gridWrap, border, form, center, max, text2), &config)
+}
+
+func showTutorials(app fyne.App) {
+	config := Config{
+		Title:      "tutorials",
+		WindowSize: fyne.NewSize(300, 300),
+	}
+
+	// widghetの拡張
+	// クリック可能なicon, Tapped, TappedSecondary interface{}を追加することで機能追加
+	icon := newTappableIcon(theme.FyneLogo())
+
+	img := canvas.NewImageFromResource(resourceCyclePng)
+	img.FillMode = canvas.ImageFillOriginal
+
+	diagonal := container.New(
+		&diagonal{},
+		widget.NewLabel("top left"),
+		widget.NewLabel("middle"),
+		widget.NewLabel("bottom right"),
+	)
+
+	Show(app, container.New(layout.NewVBoxLayout(), icon, diagonal, img), &config)
+}
+
+type diagonal struct {
+}
+
+// 最初に表示領域としてMiniSizeを設定
+func (d *diagonal) MinSize(objects []fyne.CanvasObject) fyne.Size {
+	w, h := float32(0), float32(0)
+	for _, o := range objects {
+		childSize := o.MinSize()
+
+		w += childSize.Width
+		h += childSize.Height
+	}
+	return fyne.NewSize(w, h)
+}
+
+// 実際の配置
+func (d *diagonal) Layout(objects []fyne.CanvasObject, containerSize fyne.Size) {
+	pos := fyne.NewPos(0, containerSize.Height-d.MinSize(objects).Height)
+	for _, o := range objects {
+		size := o.MinSize()
+		o.Resize(size)
+		o.Move(pos)
+
+		// 追加したcontentのサイズ分加算(右下に連鎖していく感じ)
+		pos = pos.Add(fyne.NewPos(size.Width, size.Height))
+	}
 }
