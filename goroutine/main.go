@@ -232,6 +232,7 @@ func (c *PingPongController) UnResist(player *PingPongPlayer) {
 	fmt.Printf("UnResist %s\n", player.Name)
 	delete(c.Players, player)
 	// player.End <- true
+	// channelをcloseすることで完了を通知
 	player.Close()
 }
 
