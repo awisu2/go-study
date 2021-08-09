@@ -240,20 +240,30 @@ type PingPongPlayer struct {
 	Name string
 	Hitted chan int
 	End chan bool
+	isEnd bool
 }
 
 func (p *PingPongPlayer) Run() {
 	defer fmt.Println("PingPongPlayer Run End. " + p.Name)
-	// defer p.Close()
 	
 	L: for {
 		select {
 		case n, ok := <- p.Hitted:
 			if !ok {
+				fmt.Println("HItted close " + p.Name)
 				break L
 			}
+			fmt.Println("HItted " + p.Name)
 			if n > 0 {
 				time.Sleep(time.Second)
+			}
+			// close ではタイミングが合わない事があるため、フラグ管理も同時に行う
+			// channelを実行中にcloseをするとループが回ってこないみたい
+			// TODO: 無駄なフラグな気もするのでもっといい方法があればそっちを使いたい
+			// (PingPongPlayer Run End が出力されない)
+			if p.isEnd {
+				fmt.Println("isEnd " + p.Name)
+				break L
 			}
 			p.Controller.Hit <- &PingPongHit{
 				Player: p,
@@ -271,6 +281,7 @@ func (p *PingPongPlayer) Close() {
 	fmt.Println("PingPongPlayer Close. " + p.Name)
 	close(p.Hitted)
 	close(p.End)
+	p.isEnd = true
 }
 
 type PingPongHit struct {
@@ -318,5 +329,5 @@ func samplePingPong2() {
 	controller.End <- true
 
 	// 終了処理待ち
-	time.Sleep(time.Second * 2)
+	time.Sleep(time.Second)
 }
