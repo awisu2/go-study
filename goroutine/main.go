@@ -9,7 +9,8 @@ func main() {
 	// sampleHello()
 	// sampleChannel()
 	// sampleChannelLimit()
-	samplePingPong()
+	// samplePingPong()
+	samplePingPong2()
 }
 
 func sampleHello() {
@@ -182,4 +183,140 @@ func samplePingPong() {
 		// 待機しないとerrorログを華麗にスルーしてしまうので待機
 		time.Sleep(time.Second * 3)
 	}
+}
+
+// 集中管理型
+type PingPongController struct {
+	Resist chan *PingPongPlayer
+	End chan bool
+	Hit chan *PingPongHit
+
+	Players map[*PingPongPlayer]bool
+}
+
+func (c *PingPongController) Run() {
+	defer c.Close()
+
+	L: for {
+		select {
+		case player := <- c.Resist:
+			fmt.Printf("resist %s\n", player.Name)
+			c.Players[player] = true
+
+		case hit := <- c.Hit:
+
+			fmt.Printf("Hit %s %d\n", hit.Player.Name, hit.Num)
+			for player := range c.Players {
+				if (player != hit.Player) {
+					player.Hitted <- hit.Num
+					break
+				}
+			}
+
+		case <- c.End:
+			for player := range c.Players {
+				c.UnResist(player)
+			}
+			break L
+		}
+	}
+}
+
+func (c *PingPongController) Close() {
+	fmt.Println("PingPongController Close")
+	close(c.Resist)
+	close(c.End)
+}
+
+func (c *PingPongController) UnResist(player *PingPongPlayer) {
+	fmt.Printf("UnResist %s\n", player.Name)
+	delete(c.Players, player)
+	// player.End <- true
+	player.Close()
+}
+
+type PingPongPlayer struct {
+	Controller *PingPongController
+	Name string
+	Hitted chan int
+	End chan bool
+}
+
+func (p *PingPongPlayer) Run() {
+	defer fmt.Println("PingPongPlayer Run End. " + p.Name)
+	// defer p.Close()
+	
+	L: for {
+		select {
+		case n, ok := <- p.Hitted:
+			if !ok {
+				break L
+			}
+			if n > 0 {
+				time.Sleep(time.Second)
+			}
+			p.Controller.Hit <- &PingPongHit{
+				Player: p,
+				Num: n + 1,
+			}
+
+		case <- p.End:
+			fmt.Printf("end %s\n", p.Name)
+			break L
+		}
+	}
+}
+
+func (p *PingPongPlayer) Close() {
+	fmt.Println("PingPongPlayer Close. " + p.Name)
+	close(p.Hitted)
+	close(p.End)
+}
+
+type PingPongHit struct {
+	Player *PingPongPlayer
+	Num int
+}
+
+func CreatePingPongController() *PingPongController{
+	return &PingPongController{
+		Resist: make(chan *PingPongPlayer),
+		End: make(chan bool),
+		Hit: make(chan *PingPongHit),
+		Players: map[*PingPongPlayer]bool{},
+	}
+}
+
+func CreatePingPongPlayer(controller *PingPongController, name string) *PingPongPlayer{
+	return &PingPongPlayer{
+		Controller: controller,
+		Name: name,
+		Hitted: make(chan int),
+		End: make(chan bool),
+	}
+}
+
+func samplePingPong2() {
+	controller := CreatePingPongController()
+
+	ping := CreatePingPongPlayer(controller, "ping")
+	pong := CreatePingPongPlayer(controller, "pong")
+	pang := CreatePingPongPlayer(controller, "pang")
+
+	go controller.Run()
+	go ping.Run()
+	go pong.Run()
+	go pang.Run()
+
+	controller.Resist <- ping
+	controller.Resist <- pong
+	controller.Resist <- pang
+
+	// ラリー
+	ping.Hitted <- 0
+	time.Sleep(time.Second * 5)
+	controller.End <- true
+
+	// 終了処理待ち
+	time.Sleep(time.Second * 2)
 }
