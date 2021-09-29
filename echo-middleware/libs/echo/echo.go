@@ -19,10 +19,13 @@ type Router func(e *echo.Echo)
 
 type TemplateConfig struct {
 	Key string
+	// tempalteに適応する関数郡
 	CreateFuncs func(t *template.Template) map[string]interface{}
+	// template.ParseGlobによる対象テンプレートファイル(ex: "templates/*.html")
 	GlobPattern string
 }
 
+// structのデフォルトがfalseのため、デフォルトonのものはNo設定
 type Config struct {
 	IsProduction bool
 	Address string

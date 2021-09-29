@@ -16,6 +16,8 @@ type TemplateData struct {
 	Config *app.Config
 }
 
+
+// 一定のデータをinterface{}で持たせて、テンプレートの表示
 func renderTemplate(c echo.Context, data *TemplateData) error {
 	data.Config = app.GetConfig()
 
