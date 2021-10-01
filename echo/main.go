@@ -1,6 +1,8 @@
 package main
 
 import (
+	"html/template"
+	"io"
 	"net/http"
 	"runtime"
 
@@ -8,10 +10,19 @@ import (
 	"github.com/labstack/echo/v4/middleware"
 )
 
+type Template struct {
+    templates *template.Template
+}
+
+func (t *Template) Render(w io.Writer, name string, data interface{}, c echo.Context) error {
+	return t.templates.ExecuteTemplate(w, name, data)
+}
+
 func main() {
 	e := echo.New()
 
 	setMiddleware(e)
+	setTemplate(e)
 	setRoute(e)
 
 	// windowsの場合、hostをつけないとセキュリティアラートが出る
@@ -28,7 +39,20 @@ func setMiddleware(e *echo.Echo) {
 	e.Use(middleware.Logger())
 }
 
+// テンプレートの登録
+func setTemplate(e *echo.Echo) {
+	// インタフェースに合わせてRendererを上書き,viewsから呼び出す
+	t := &Template{
+		templates: template.Must(template.ParseGlob("public/views/*.html")),
+	}
+	e.Renderer = t
+}
+
 func setRoute(e *echo.Echo) {
+	// e.GET("/", func(c echo.Context) error {
+	// 	return c.String(http.StatusOK, "Hello, World!")
+	// })
+
 	e.GET("/", func(c echo.Context) error {
 		return c.String(http.StatusOK, "Hello, World!")
 	})
