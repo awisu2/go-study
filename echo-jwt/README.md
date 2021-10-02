@@ -2,6 +2,34 @@
 
 [JWT Recipe | Echo - High performance, minimalist Go web framework](https://echo.labstack.com/cookbook/jwt/)
 
+- 問い合わせサンプル(後述)
+- このコードでは DB でのログイン処理も実装したが、中核は変わらない
+  - token を生成する際の確認に DB にアクセスするか、ローカルデータにアクセスするかの違いのみ
+
+jwt の token を生成
+
+```go
+	// Set custom claims(データ)
+	claims := &JwtCustomClaims{
+		"Jon Snow",
+		true,
+		jwt.StandardClaims{
+			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+		},
+	}
+
+	// Create token with claims
+	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+
+	// Generate encoded token and send it as response.
+	t, err := token.SignedString([]byte(signingKey))
+	if err != nil {
+		return "", err
+	}
+```
+
+## 問い合わせサンプル
+
 ```bash
 $ http -f POST localhost:1323/login username=jon password=shhh!
 
