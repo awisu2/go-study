@@ -14,10 +14,11 @@ var GoString = Struct({
   n: 'longlong'
 })
 
-var file = './awesome.so'
+var file = './awesome.dll'
 var fs = require('fs')
 if (!fs.existsSync(file)) {
   console.log('not exists file. ' + file)
+  process.exit(1)
 }
 
 // TOOD: Dynamic Linking Error: Win32 error 126 と出て通らない
