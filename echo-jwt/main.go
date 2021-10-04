@@ -11,7 +11,7 @@ import (
 )
 
 var SIGNING_KEY = "secret"
-var IS_DB = true
+var IS_DB = false
 
 func login(c echo.Context) error {
 	username := c.FormValue("username")

@@ -1,6 +1,7 @@
 package local
 
 import (
+	"log"
 	"time"
 
 	"github.com/golang-jwt/jwt"
@@ -33,6 +34,8 @@ func Login(username string, password string, signingKey string) (string, error) 
 
 	// Create token with claims
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, claims)
+	// 必要であればここでkidを付与できる
+	token.Header["kid"] = "abc"
 
 	// Generate encoded token and send it as response.
 	t, err := token.SignedString([]byte(signingKey))
@@ -46,5 +49,8 @@ func Login(username string, password string, signingKey string) (string, error) 
 func GetUser(c echo.Context) *JwtCustomClaims {
 	user := c.Get("user").(*jwt.Token)
 	claims := user.Claims.(*JwtCustomClaims)
+	header := user.Header
+	log.Println("claims", claims)
+	log.Println("header", header)
 	return claims
 }

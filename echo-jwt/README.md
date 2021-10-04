@@ -5,6 +5,11 @@
 - 問い合わせサンプル(後述)
 - このコードでは DB でのログイン処理も実装したが、中核は変わらない
   - token を生成する際の確認に DB にアクセスするか、ローカルデータにアクセスするかの違いのみ
+- Header に kid を付与したい場合は、NewWithClaims で生成したインスタンスにセット(`token.Header["kid"] = "abc"`)
+- JWTConfig(利用しそうな部分だけ)
+  - KeyFunc, SigningKeys, SigningKey: token の Unsign 処理で利用される signKey の設定
+    - 運用考えると KeyFunc, SigningKeys のどちらかを利用したほうがいい気がする。記載順に nil チェックされ利用される
+  - ContextKey: jwt 認証を通った claim を取得する際のキー名(default: "user")
 
 jwt の token を生成
 
