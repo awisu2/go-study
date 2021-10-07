@@ -28,7 +28,7 @@ func Login(username string, password string, signingKey string) (string, error) 
 		"Jon Snow",
 		true,
 		jwt.StandardClaims{
-			ExpiresAt: time.Now().Add(time.Hour * 72).Unix(),
+			ExpiresAt: time.Now().Add(time.Hour * 10).Unix(),
 		},
 	}
 
@@ -47,7 +47,10 @@ func Login(username string, password string, signingKey string) (string, error) 
 }
 
 func GetUser(c echo.Context) *JwtCustomClaims {
-	user := c.Get("user").(*jwt.Token)
+	i := c.Get("user")
+	log.Println(i)
+
+	user := i.(*jwt.Token)
 	claims := user.Claims.(*JwtCustomClaims)
 	header := user.Header
 	log.Println("claims", claims)
