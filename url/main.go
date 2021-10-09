@@ -15,6 +15,7 @@ func main() {
 	parse2()
 
 	modify()
+	copy() 
 }
 
 func parse() {
@@ -66,4 +67,23 @@ func modify() {
 	_url.Fragment = ""
 	_url.RawQuery = "foo=foo&bar=bar"
 	fmt.Println(_url)  // https://foo.bar:1234/a/b/c?foo=foo&bar=bar
+}
+
+// url.URLのコピー
+//
+// 一度、インスタンスの実態を引き渡しコピーを作成し、その後ポインタを取得いう手順
+// copiedUrl := &(*_url) では元の参照に戻るため、実態コピーを作る１手が必要
+//
+func copy() {
+	fmt.Println("copy -----")
+	_url, _ := url.Parse(S)
+
+	copy := func (_url url.URL) *url.URL {
+		return &_url
+	}
+	copiedUrl := copy(*_url) // &(*_url) ではだめ
+	copiedUrl.Host = "hoge.fuga"
+
+	fmt.Println(_url) // https://foo.bar:1234/a/b/c?foo=bar&bar=foo#fragment
+	fmt.Println(copiedUrl) // https://hoge.fuga/a/b/c?foo=bar&bar=foo#fragment
 }

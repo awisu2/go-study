@@ -17,7 +17,7 @@ SliceStable: 安定ソート の動作条件が不明。なので実装時利用
 - 逆ソートの例を見るとわかるが、もともと sort.Interface に適合させて実行という形だったらしい
   - sort.Sort が出てきたら確認しておくといいかも
 
-## sample
+### sample
 
 ```go
 func sorting() {
