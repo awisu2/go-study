@@ -28,11 +28,12 @@ var rootCmd = &cobra.Command{
   // positional argumentsの設定(default: cobra.NoArgs(引数あるとエラー))
   Args: cobra.ArbitraryArgs,
   // これがない場合はヘルプが実行される
-  Run: func(cmd *cobra.Command, args []string) {
+  RunE: func(cmd *cobra.Command, args []string) error {
     log.Println("hello")
     // フラグから特定の型で値を取得(Flags と PersistentFlags は明確に異なるので注意)
     foo, err := cmd.Flags().GetString("foo")
     bar, err := cmd.PersistentFlags().GetString("bar")
+    return nil
   }
 }
 
