@@ -7,12 +7,16 @@ study cobra, golang cli module
 
 ## 簡単解説
 
+- pythonなどから来た場合、argparseでもいいかもしれない
+  - [akamensky/argparse: Argparse for golang. Just because `flag` sucks](https://github.com/akamensky/argparse)
+  - 優位点としては、viperとも連携できること。packageへの分割が前提として考慮されており見通しが良いことなどが挙げられる
 - "cmd" パッケージ(ディレクトリ)を作成し、main から Execute()などで実行する構成
 - コマンドに相当するインスタンスを生成し。Execute()する
 - コマンドにはコマンドを追加でき、階層的呼び出しが可能
   - `rootCmd.AddCommand(secondCmd)`
   - 一番親となるコマンドのことを rootCommand と称するらしい
   - 親コマンドへの登録などは 各ファイルの init() で実行することでファイルごとに処理系を分散
+- viper(config系module), flag と共存することも可能
 
 ## sample
 
@@ -33,22 +37,31 @@ var rootCmd = &cobra.Command{
 }
 
 func init() {
-	cobra.OnInitialize(initConfig)
+  cobra.OnInitialize(onInitialize)
 
-// 1. --author or -a の引数設定
-	// 値取得は `cmd.Flags().GetString("author")`
-	rootCmd.Flags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
-	// 2. --config の引数設定、Persistent がつき下位のコマンドにも継続適用される
-	// 値取得その1は `&cfgFile` にセットされている。見たまんま
-	// 値取得その2は `cmd.PersistentFlags().GetString("config")` でも取得可能
-	// Note: Flags と PersistentFlags は明確に別れているので注意
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
+  // 1. --author or -a の引数設定
+  // 値取得は `cmd.Flags().GetString("author")`
+  rootCmd.Flags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
 
-	// 必須にする
-	rootCmd.MarkPersistentFlagRequired("config")
+  // 2. --config の引数設定、Persistent がつき下位のコマンドにも継続適用される
+  // 値取得その1は `&cfgFile` にセットされている。見たまんま
+  // 値取得その2は `cmd.PersistentFlags().GetString("config")` でも取得可能
+  // Note: Flags と PersistentFlags は明確に別れているので注意
+  rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
 
-	// 子コマンド
+  // 必須にする
+  rootCmd.MarkPersistentFlagRequired("config")
+
+  // 子コマンド
   rootCmd.AddCommand(subCmd)
+}
+
+func onInitialize() {
+  // anything ok
+}
+
+func Execute() error {
+  return rootCmd.Execute()
 }
 ```
 
