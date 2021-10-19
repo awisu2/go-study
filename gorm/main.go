@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"go-study/gorm/db"
 	"log"
+	"time"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -11,8 +12,8 @@ import (
 
 
 func main() {
-	// db := database.OpenSqlite()
-	DB := db.OpenPostgresql()
+	DB := db.OpenSqlite()
+	// DB := db.OpenPostgresql()
 
   db.AutoMigrate(DB)
 
@@ -21,6 +22,7 @@ func main() {
   sampleRelationOneToOne(DB)
   sampleRelationHasMany(DB)
   sampleRelationMtom(DB)
+  SampleNullTime(DB)
 }
 
 func sampleGetstart(DB *gorm.DB) {
@@ -163,4 +165,25 @@ func sampleRelationMtom(DB *gorm.DB) {
   } else {
     fmt.Println(items2)
   }
+}
+
+
+// nulltimeのwhereの挙動をテスト
+//
+// 通常のdatetimeフィールドと同じように扱っても良さそう
+func SampleNullTime(DB *gorm.DB) {
+  log.Println("---------- SampleNullTime")
+
+  // NullTime に対して IS NOT NULLは有効
+  users := []db.User{}
+  DB.Where("updated_at IS NOT NULL").Find(&users)
+  log.Println(len(users))
+  DB.Where("updated_at IS NULL").Find(&users)
+  log.Println(len(users))
+
+  // NullTime に対して 時間検索
+  DB.Where("updated_at < ?", time.Now()).Find(&users)
+  log.Println(len(users))
+  DB.Where("updated_at > ?", time.Now()).Find(&users)
+  log.Println(len(users))
 }

@@ -14,7 +14,8 @@ var GoString = Struct({
   n: 'longlong'
 })
 
-var file = './awesome.dll'
+// var file = './awesome.dll'
+var file = 'D:\\develop\\study\\go-study\\sharedGo\\fromnode\\awesome.dll'
 var fs = require('fs')
 if (!fs.existsSync(file)) {
   console.log('not exists file. ' + file)
@@ -31,6 +32,7 @@ var awesome = ffi.Library(file, {
 console.log('awesome.Add(12, 99) = ', awesome.Add(12, 99))
 console.log('awesome.Cosine(1) = ', awesome.Cosine(1))
 nums = LongArray([12, 54, 0, 423, 9])
+
 var slice = new GoSlice()
 slice['data'] = nums
 slice['len'] = 5
