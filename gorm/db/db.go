@@ -31,12 +31,23 @@ func open(dialector gorm.Dialector) *gorm.DB{
 }
 
 func AutoMigrate(db *gorm.DB) {
-  db.AutoMigrate(&Product{}, &User{}, &ROnetooneBase{}, &ROnetooneItem{}, &RHasmanyBase{}, &RHasmanyItem{}, &RMtomBase{}, &RMtomItem{})
+  db.AutoMigrate(
+		&Company{},
+		&Product{},
+		&User{},
+		&ROnetooneBase{},
+		&ROnetooneItem{},
+		&RHasmanyBase{},
+		&RHasmanyItem{},
+		&RMtomBase{},
+		&RMtomItem{},
+	)
 }
 
 func CreateGormConfig() *gorm.Config {
-	// logger: https://gorm.io/ja_JP/docs/logger.html
+	// logger
 	//
+	// https://gorm.io/ja_JP/docs/logger.html
 	// SlowThresholdは挙動を確認したいため0にセット。これを超えないと、Loglevelがinfoでも出力されない
 	//
 	gormLogger := logger.New (

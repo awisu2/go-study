@@ -10,12 +10,20 @@ type Product struct {
 
 type User struct {
 	// add id, created_at, updated_at, deleted_at
-  gorm.Model
+  // gorm.Model
+  ID        uint           `gorm:"primaryKey"`
 	// 実際のカラムでは user_id になる
   UserId string `gorm:"uniqueIndex,not null"`
 	Name string
+  CompanyRefer string
+  Company   Company `gorm:"references:Code;foreignKey:CompanyRefer;constraint:OnUpdate:SET NULL,OnDelete:CASCADE;"`
 }
 
+type Company struct {
+  ID   int `gorm:"uniqueIndex,not null"`
+  Code string `gorm:"uniqueIndex,not null"`
+  Name string
+}
 
 type ROnetooneBase struct {
   ID        uint           `gorm:"primaryKey"`

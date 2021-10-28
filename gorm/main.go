@@ -17,12 +17,13 @@ func main() {
 
   db.AutoMigrate(DB)
 
-  sampleGetstart(DB)
-  sampleCreateUser(DB)
-  sampleRelationOneToOne(DB)
-  sampleRelationHasMany(DB)
-  sampleRelationMtom(DB)
-  SampleNullTime(DB)
+  // sampleGetstart(DB)
+  // sampleCreateUser(DB)
+  // sampleRelationOneToOne(DB)
+  // sampleRelationHasMany(DB)
+  // sampleRelationMtom(DB)
+  // SampleNullTime(DB)
+  sampleJoin(DB)
 }
 
 func sampleGetstart(DB *gorm.DB) {
@@ -186,4 +187,114 @@ func SampleNullTime(DB *gorm.DB) {
   log.Println(len(users))
   DB.Where("updated_at > ?", time.Now()).Find(&users)
   log.Println(len(users))
+}
+
+func sampleJoin(DB *gorm.DB) {
+
+  printCompanies(DB)
+
+  // 削除
+  //
+  // Unscoped(): 物理削除
+  // .Session(&gorm.Session{AllowGlobalUpdate: true}): whereなしでもdelete
+  //
+  DB.Unscoped().Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(db.Company{})
+  DB.Unscoped().Session(&gorm.Session{AllowGlobalUpdate: true}).Delete(db.User{})
+
+  cp1 := db.Company{
+    Name: "companyA",
+    Code: "a",
+  }
+  cp2 := db.Company{
+    Name: "companyB",
+    Code: "b",
+  }
+
+  // 事前に宣言した値も更新したい場合は、参照にする必要あり(配列作成時にコピーされている)
+  companies := []*db.Company {
+    &cp1, &cp2,
+  }
+  if err:=DB.Create(companies).Error; err != nil {
+    log.Panic(err)
+  }
+
+  // 注意: Companyは参照ではないため、Update,Save,Deleteの影響を受けない、扱いには注意
+  _users := []db.User{
+    {
+      Name: "user1",
+      Company: cp1,
+    },
+    {
+      Name: "user2",
+      Company: cp2,
+    },
+    {
+      Name: "no company",
+    },
+  }
+  if err:=DB.Create(_users).Error; err != nil {
+    log.Panic(err)
+  }
+
+  log.Printf("ID: %d, name: %s, code: %s\n", cp1.ID, cp1.Name, cp1.Code)
+  log.Printf("ID: %d, name: %s, code: %s\n", cp2.ID, cp2.Name, cp2.Code)
+  for i := range companies {
+    log.Printf("%v\n", companies[i])
+  }
+
+  for i := range _users {
+    log.Printf("%v\n", _users[i])
+  }
+
+
+  var users []db.User
+  DB.Find(&users)
+  for i := range users {
+    log.Println(users[i])
+  }
+
+  // ここでPreleadに指定しているのは、User structのフィールド名(テーブル名じゃない)
+  DB.Preload("Company").Find(&users)
+  for i := range users {
+    log.Println(users[i])
+  }
+
+  // 更新
+  cp1.Name = "cp1 update"
+  if err:=DB.Save(&cp1).Error; err != nil {
+    log.Panic(err)
+  }
+  if err:=DB.Model(&cp2).Updates(db.Company{Code: "bbb", Name: "cp2 update"}).Error; err != nil {
+    log.Panic(err)
+  }
+  printCompanies(DB)
+  printUsers(DB)
+
+  // 削除
+  if err:=DB.Unscoped().Delete(&cp2).Error; err != nil {
+    log.Panic(err)
+  }
+  printCompanies(DB)
+  printUsers(DB)
+
+}
+
+func printUsers(DB *gorm.DB) {
+  var users []db.User
+  DB.Preload("Company").Find(&users)
+  log.Println("printUsers -----")
+  for i := range users {
+    user := users[i]
+
+    log.Printf("%v: %s. Company: (%s) %v\n", user.ID, user.Name, user.CompanyRefer, user.Company)
+  }
+}
+
+func printCompanies(DB *gorm.DB) {
+  var users []db.Company
+  DB.Find(&users)
+  log.Println("printCompanies -----")
+  for i := range users {
+    log.Println(users[i])
+  }
 }
