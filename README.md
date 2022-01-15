@@ -15,6 +15,7 @@
 - [sharedGo](./sharedGo): node の native モジュールで動作させることを目標とした実験
 - [struct](./struct): struct 構造体
 - [time](./time): time
+- [test](./test): test
 - [tour-of-go](./tour-of-go): tour-of-go 用
 - [url](./url): url の取り扱い
 
