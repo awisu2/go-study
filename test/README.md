@@ -14,9 +14,7 @@ go test
   - ベンチマーク:
     - 関数は _Benchmark_ で始まること
     - ファイル名は test と同じで追加する感じ
-- テスト引数
-  - testing.T: 通常のテスト用
-  - testing.B: ベンチマークを実行し処理時間を図る
+- test ファイル のパッケージはテスト対象と同じにして関数呼び出しを簡易にするのが基本と思われる
 
 ## テストコマンド
 
@@ -39,7 +37,16 @@ go test
 
 ## サンプルコード
 
+_main_test.go_
+
 ```go
+package main
+
+import (
+	"testing"
+)
+
+// テスト
 func TestAbs(t *testing.T) {
     got := Abs(-1)
     if got != 1 {
@@ -47,10 +54,12 @@ func TestAbs(t *testing.T) {
     }
 }
 
+// ベンチマーク
 func BenchmarkAbs(b *testing.B) {
     got := Abs(-1)
     if got != 1 {
         b.Errorf("Abs(-1) = %d; want 1", got)
     }
 }
+
 ```
