@@ -23,7 +23,8 @@ func main() {
   // sampleRelationHasMany(DB)
   // sampleRelationMtom(DB)
   // SampleNullTime(DB)
-  sampleJoin(DB)
+  sampleRelation(DB)
+  // sampleJoin(DB)
 }
 
 func sampleGetstart(DB *gorm.DB) {
@@ -189,7 +190,7 @@ func SampleNullTime(DB *gorm.DB) {
   log.Println(len(users))
 }
 
-func sampleJoin(DB *gorm.DB) {
+func sampleRelation(DB *gorm.DB) {
 
   printCompanies(DB)
 
@@ -259,6 +260,8 @@ func sampleJoin(DB *gorm.DB) {
     log.Println(users[i])
   }
 
+  sampleJoin(DB)
+
   // 更新
   cp1.Name = "cp1 update"
   if err:=DB.Save(&cp1).Error; err != nil {
@@ -297,4 +300,18 @@ func printCompanies(DB *gorm.DB) {
   for i := range users {
     log.Println(users[i])
   }
+}
+
+func sampleJoin(DB *gorm.DB) {
+  log.Println("sampleJoin -----")
+  var users []db.User
+  res := DB.Model(&db.User{}).Select(
+    "users.*",
+    ).Joins(
+      "INNER JOIN companies ON users.company_refer == companies.code",
+    ).Where("companies.id > ?", 0).Scan(&users)
+  if res.Error != nil {
+    log.Panic(res.Error)
+  }
+  log.Println(&users)
 }

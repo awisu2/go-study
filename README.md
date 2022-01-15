@@ -2,6 +2,10 @@
 
 自分用 go 勉強リポジトリです
 
+- [agouti](./agouti): ブラウザテスト用パッケージ
+
+## インストールなど基本事項
+
 - install: [Download and install - The Go Programming Language](https://golang.org/doc/install)
 - commands: 詳細は後述
   - create mod: `go mod init {domain/module}`
