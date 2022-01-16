@@ -9,6 +9,7 @@
 - [array-slice](./array-slice): array/slice
 - [goroutine](./goroutine): goroutine
 - [interface](./interface): interface
+- [imags](./imags): imags
 - [json](./json): json への変換及びデコード時処理
 - [pointer-behavior](./pointer-behavior): 各種値の参照の取り扱い
 - [regexp](./regexp): 正規表現

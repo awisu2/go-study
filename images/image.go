@@ -2,10 +2,11 @@ package image
 
 import (
 	"image"
-	"image/color"
 	"image/jpeg"
 	"image/png"
 	"os"
+
+	"golang.org/x/image/draw"
 )
 
 // 保存オプション
@@ -16,18 +17,18 @@ type SaveOption struct {
 }
 
 type CreateOption struct {
-	X0 int
-	Y0 int
-	X1 int
-	Y1 int
+	Size
 	SaveOption
+}
+
+func CreateImage(size *Size) *image.RGBA {
+	img := image.NewRGBA(image.Rect(0, 0, size.Width, size.Height))
+	return img
 }
 
 // 画像作成
 func Create(option *CreateOption) error {
-	rect := image.Rect(option.X0, option.Y0, option.X1, option.Y1)
-	img := image.NewRGBA(rect)
-	img.SetRGBA(1, 1, color.RGBA{255, 0, 0, 0})
+	img := CreateImage(&option.Size)
 
 	err := Save(img, &option.SaveOption)
 	if err != nil {
@@ -55,4 +56,26 @@ func Save(img image.Image, option *SaveOption) (err error) {
 	}
 
 	return nil
+}
+
+// 特定のファイルを読み込み
+func Open(path string) (image.Image, error) {
+	f, err := os.Open(path)
+	if err != nil {
+		return nil, err
+	}
+	defer f.Close()
+
+	image, _, err := image.Decode(f)
+	if err != nil {
+		return nil, err
+	}
+
+	return image, nil
+}
+
+func Resize(img image.Image, size *Size) (*image.RGBA, error) {
+	resizedImg := CreateImage(size)
+	draw.CatmullRom.Scale(resizedImg, resizedImg.Bounds(), img, img.Bounds(), draw.Over, nil)
+	return resizedImg, nil
 }
