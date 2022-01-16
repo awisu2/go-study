@@ -1,4 +1,4 @@
-package image
+package images
 
 // formtディレクトリなど作ってサブパッケージに分けたいがimportが複雑になるので同パッケージで管理
 type Format string

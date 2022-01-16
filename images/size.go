@@ -1,5 +1,6 @@
-package image
+package images
 
+// Info: Point structがimage packageに含まれるが用途が違うため新規宣言
 type Size struct {
 	Width  int
 	Height int

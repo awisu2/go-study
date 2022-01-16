@@ -1,4 +1,4 @@
-package image
+package images
 
 import (
 	"testing"
@@ -10,10 +10,11 @@ var createOption = CreateOption{
 		Height: 50,
 	},
 	SaveOption: SaveOption{
-		Path:    "sample.jpg",
-		Format:  Jpg,
+		Path:    "sample.png",
+		Format:  Png,
 		Quality: 70,
 	},
+	Color: RgbaGreen,
 }
 
 func TestCreate(t *testing.T) {
@@ -64,9 +65,8 @@ func TestResize(t *testing.T) {
 
 	// リサイズ済み画像保存
 	err = Save(resizedImg, &SaveOption{
-		Path:    "sample2.jpg",
-		Format:  Jpg,
-		Quality: 70,
+		Path:   "sample2.png",
+		Format: Png,
 	})
 	if err != nil {
 		t.Errorf("save error: %v", err)
