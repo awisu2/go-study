@@ -18,6 +18,9 @@ go test
 
 ## テストコマンド
 
+[go command \- cmd/go \- pkg\.go\.dev](https://pkg.go.dev/cmd/go#hdr-Testing_flags)
+
+- ヘルプ: `go help test` ただあまり情報が多くない(--bench すら出てこない)
 - 全テスト: `go test`
 - パッケージや関数名を指定してテスト: `go test {package} -run {regexp}`
   - 正規表現は部分一致,大/小文字区別あり,関数名に一致 (何も指定しない "" 場合は全てに一致)
@@ -33,7 +36,16 @@ go test
 - regexp チートシート(--bench も-run も同条件)
   - 全テスト/ベンチマーク: `go test ./... --bench .`
   - ベンチマークのみ: `go test ./... -run ^$ --bench .` (前方一致と後方一致で挟み込んで対象なしに)
-- オプションドキュメント: [go command \- cmd/go \- pkg\.go\.dev](https://pkg.go.dev/cmd/go#hdr-Testing_flags)
+
+### オプション
+
+- 実行されるテスト個々の情報を出力: `-v`
+- 指定回数実行: `-count n`
+- 利用 cpu 数(GOMAXPROCS): `-cpu 1,2,4`
+
+### 追加出力
+
+- `-benchmem`: --bench でベンチマークが実行された時、メモリ割当情報が追加される
 
 ## サンプルコード
 
@@ -61,5 +73,8 @@ func BenchmarkAbs(b *testing.B) {
         b.Errorf("Abs(-1) = %d; want 1", got)
     }
 }
-
 ```
+
+## todo
+
+- [] 追加出力の詳細をまとめる
