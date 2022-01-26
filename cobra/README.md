@@ -21,6 +21,8 @@ study cobra, golang cli module
 
 ### 参考コード
 
+コピペ利用に対応
+
 ```go
 package cmd
 
