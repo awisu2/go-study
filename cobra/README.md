@@ -5,89 +5,128 @@ study cobra, golang cli module
 - [spf13/cobra: A Commander for modern Go CLI interactions](https://github.com/spf13/cobra)
 - [spf13/viper: Go configuration with fangs](https://github.com/spf13/viper)
 
+## 残タスク
+
+- [] viperとの連携
+- [] なぜinit()で記載しているのか？
+
 ## 簡単解説
 
 - pythonなどから来た場合、argparseでもいいかもしれない
   - [akamensky/argparse: Argparse for golang. Just because `flag` sucks](https://github.com/akamensky/argparse)
   - 優位点としては、viperとも連携できること。packageへの分割が前提として考慮されており見通しが良いことなどが挙げられる
-- "cmd" パッケージ(ディレクトリ)を作成し、main から Execute()などで実行する構成
-- コマンドに相当するインスタンスを生成し。Execute()する
-- コマンドにはコマンドを追加でき、階層的呼び出しが可能
-  - `rootCmd.AddCommand(secondCmd)`
-  - 一番親となるコマンドのことを rootCommand と称するらしい
-  - 親コマンドへの登録などは 各ファイルの init() で実行することでファイルごとに処理系を分散
 - viper(config系module), flag と共存することも可能
 
-## sample
+## 実装
+
+- サンプルコード: [cmd/root.go](./cmd/root.go)
+- 配置: "cmd" パッケージ(ディレクトリ)内に記載していくのが参考構成
+  - `init()` で引数設定、配下コマンドの追加をする理由: よくわかってない 引数、viperでのconfig値による処理の分岐を許容数ため？
+- cmd.Execute() での統一を狙って、cmd 直下に `func Execute()` を用意しておく
+- 基本は `&cobra.Command{}` でコマンドを作成し引数やdescriptionの設定、配下にコマンドを追加も可能
+  - コマンドの追加: `rootCmd.AddCommand(secondCmd)`
+- 引数の取得: `cmd.[Persistent]Flags().GetXXX({key})`で取得が可能
+  - 引数設定で直接引数にセットすることも可能
+
+## cobra.Commandのもうちょっと細かい話
+
+公式: [cobra package \- github\.com/spf13/cobra \- pkg\.go\.dev](https://pkg.go.dev/github.com/spf13/cobra#Command)
+
+ざっくりサンプルコード
 
 ```go
 var rootCmd = &cobra.Command{
-  Use: "cobra",
-  Short: "cobra sample",
-  Logn: "try cobra sample",
-  // positional argumentsの設定(default: cobra.NoArgs(引数あるとエラー))
-  Args: cobra.ArbitraryArgs,
-  // これがない場合はヘルプが実行される
-  RunE: func(cmd *cobra.Command, args []string) error {
-    log.Println("hello")
-    // フラグから特定の型で値を取得(Flags と PersistentFlags は明確に異なるので注意)
-    foo, err := cmd.Flags().GetString("foo")
-    bar, err := cmd.PersistentFlags().GetString("bar")
+	Use:   "sample", // コマンド名(ここでは "{go run .} sample" となる)
+	Short: "short description", // 簡易説明
+	Long:  `long description`, // 詳細説明
+	Args: cobra.OnlyValidArgs,
+
+	// 実行コマンド
+	RunE: func(cmd *cobra.Command, args []string) error {
+    // 引数の取得(flag式)
+		author, _ := cmd.Flags().GetString("author")
+		config, _ := cmd.PersistentFlags().GetString("config")
+		log.Printf("author: %v, config: %v\n", author, config)
+
     return nil
   }
-}
-
-func init() {
-  cobra.OnInitialize(onInitialize)
-
-  // 1. --author or -a の引数設定
-  // 値取得は `cmd.Flags().GetString("author")`
-  rootCmd.Flags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
-
-  // 2. --config の引数設定、Persistent がつき下位のコマンドにも継続適用される
-  // 値取得その1は `&cfgFile` にセットされている。見たまんま
-  // 値取得その2は `cmd.PersistentFlags().GetString("config")` でも取得可能
-  // Note: Flags と PersistentFlags は明確に別れているので注意
-  rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
-
-  // 必須にする
-  rootCmd.MarkPersistentFlagRequired("config")
-
-  // 子コマンド
-  rootCmd.AddCommand(subCmd)
-}
-
-func onInitialize() {
-  // anything ok
-}
-
-func Execute() error {
-  return rootCmd.Execute()
+  // or
+	Run: func(cmd *cobra.Command, args []string) {
+    ...
+	},
 }
 ```
 
+- Args: 引数の挙動を指定。エラーを返却するとRunが実行されない
+  - cobra.OnlyValidArgs: 指定した引数以外があるとエラー
+    - 別途ValidArgsを設定しておく必要あり、ValidArgsFunctionで更に細かい設定も可能
+  - cobra.NoArgs(default): 引数があるとエラー
+  - cobra.ArbitraryArgs: エラーは返さない (Arbitrary = 任意)
+  - 最大/最小個数: cobra.MinimumNArgs(int), cobra.MaximumNArgs(int), cobra.RangeArgs(min, max)
+  - ピッタリ個数: cobra.ExactArgs(int), cobra.ExactValidArgs(int)
+  - カスタム: https://pkg.go.dev/github.com/spf13/cobra#PositionalArgs
+    ```go
+      Args: func(cmd *cobra.Command, args []string) error {
+        log.Println("args", args)
+        return nil
+      },
+    ```
+- RunE/Run: RunEでerror返却可能。両方設定された場合RunEが優先
+  - `[Persistent]{Per|Post}Run[E]()` も存在 (persistent = 持続的)
+  - type: `func(cmd *Command, args []string) error`
+    - argsには、第1要素にコマンド名, 第2要素以降に、positional argumentsがセットされる
+  - 引数の取得: 例: `cmd.PersistentFlags().GetString("config")`
+    - キー名はlong名のみで取得可能
+    - また、別途引数と連携するように設定した変数を利用することも可能(後述)
+
+### 引数、配下コマンド設定
+
+- 公式: [pflag package \- github\.com/spf13/pflag \- pkg\.go\.dev](https://pkg.go.dev/github.com/spf13/pflag#FlagSet)
+
+ざっくりサンプル
+
+```go
+func init() {
+	// 引数の処理後(cobra.Command.Runの前)に実行されるイベント
+	cobra.OnInitialize(initConfig)
+
+	// 1. --author or -a の引数設定
+	// 値取方法: `cmd.Flags().GetString("author")` ショートハンド名("a")では取得できない
+	rootCmd.Flags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
+
+	// 2. 配下に引き継がれる引数指定(Persistent)、引数へのセット式(xxxVar)、+ 必須指定(Requiredを付与)
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
+	rootCmd.MarkPersistentFlagRequired("config")
+
+	rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "name of license for the project")
+	rootCmd.PersistentFlags().Bool("viper", true, "use Viper for configuration")
+
+	// 配下コマンドの追加
+	rootCmd.AddCommand(tryCmd)
+}
+```
+
+- int()の実行順序: コンパイラに渡された順序とのこと
+  - 実質順序不明なので気にしないでいいように書くこと
+  - 参考
+    - [go \- Init order within a package \- Stack Overflow](https://stackoverflow.com/questions/32829538/init-order-within-a-package)
+    - [The Go Programming Language Specification \- The Go Programming Language](https://go.dev/ref/spec#Package_initialization)
+- 引数の設定:
+  - 参考構文: `cmd.Flags().String("abc", "myAbc", "abc word")`
+    - コマンド実行時 --abc で指定できる,  型はString, 初期値: "myAbc", help時説明: "abc word"
+  - 構文ルール: `cmd.[Persistent]Flags().{type}[Var][P]($arg, "long", "short", "myAbc", "abc word")`
+    - PesistentFlags: 配下コマンドでも有効
+    - Varを付与: ショートハンド名の設定が可能
+    - Pを付与す: 変数への値セットが可能
+- 必須にする: `cmd.Mark[Persistent]FlagRequired("name")`
+  - 引数設定とは別に必要
+
 ## 用語
 
+後述する記載で突然出てきたときに
+
+- flags: goではこのモジュールで引数を解析する
 - flag arguments: "-f", "--foo" などの -付きの引数
   - cobraでは主にこれの設定を行う
 - positional arguments: flag argumentsでない直接(?)並べられた引数
-- Persistent Flags: 下位のコマンドに継承されるフラグ引数
-- Local Flags:
-
-## もうちょっと細かい話
-
-- positional argumentsを許容したい
-  - Argsをコマンドに設定しないと、"unknown command" となりエラーになる
-    - 後述する NoArgs がデフォルトで設定されているのだと思われる
-  - Argsをサポートする関数郡(別に細かいことするつもりな石というときに変わりにセット)
-    - 引数なし: cobra.NoArgs
-    - とりあえずOK: cobra.ArbitraryArgs
-    - 特定の引数のみOK: cobra.OnlyValidArgs
-      - 別途ValidArgsを設定しておく必要あり、ValidArgsFunctionで更に細かい設定も可能
-    - 最大/最小個数: cobra.MinimumNArgs(int), cobra.MaximumNArgs(int), cobra.RangeArgs(min, max)
-    - ピッタリ個数: cobra.ExactArgs(int), cobra.ExactValidArgs(int)
-- Run は RunE にすることで error を返却することができる
-- サンプルでサラッと出てくる viper は同じ人? が作った設定ファイルを読み込む module
-- go の flag もサポートというか、flagてき挙動がメイン
-  - `flag.Parse()` すると 引数が flag.Args() で取得できる
-  - 事前に型宣言した値を作成しておくことによって、型付き変数に Parse させることも可能
+- Persistent: 下位のコマンドに継承されるフラグ引数
