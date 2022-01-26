@@ -4,10 +4,16 @@
 
 ## docs
 
+- [basics](./docs/basics.md): インストールや基本事項
+- [module](./docs/module.md): module の取り扱いについて(get/install コマンドなど)
+
+## contents
+
 ### 基本動作
 
 - [array-slice](./array-slice): array/slice
 - [goroutine](./goroutine): goroutine
+- [helloworld](./helloworld): hello world !
 - [interface](./interface): interface
 - [imags](./imags): imags
 - [json](./json): json への変換及びデコード時処理
@@ -20,7 +26,7 @@
 - [tour-of-go](./tour-of-go): tour-of-go 用
 - [url](./url): url の取り扱い
 
-### パッケージ動作
+### 各種 module を使ってみる
 
 - [agouti](./agouti): ブラウザコントロール API サポート(テストや自動挙動確認用)
 - [argparse](./argparse): コマンド実行時の引数解析 python に準拠
@@ -36,25 +42,6 @@
 - [lorca](./lorca): go の gui ライブラリ lorca
 - [server-echo](./server-echo): echo を実際利用するため色々構築
 - [viper](./viper): コンフィグ値の取り扱い(環境変数や特定の config ファイルからの取得など, cobra との連携も可能)
-
-## インストールなど基本事項
-
-- install: [Download and install - The Go Programming Language](https://golang.org/doc/install)
-- commands: 詳細は後述
-  - create mod: `go mod init {domain/module}`
-  - update packages: `go mod tidy`
-  - run mod: `go mod .`
-- packages: [pkg.go.dev](https://pkg.go.dev/)
-- 環境変数(GOPATH, GOROOT, GOBIN...): 後述
-- moduleGO PATH GOPATH に縛られたくない: 無理。(どうしても必要なら GOPATH の自動切り替え環境を用意)
-- test: `go test`
-  - 命名規則: file: `Xxx_test.go`, func: `TestXxx`
-    - ファイル名は何でも良い、func 名が package 内でかぶると (普通に) redeclared error
-  - Package がずれていると動作しないみたい: `found packages main (simple_sample.go)...`
-    - simple_sample_test.go の　 package を main に変えたら動いた
-- vscode での補完がおかしい: vscode workspace root = go pacakgae root である必要があるとのこと
-  - このリポジトリの用に小ディレクトリに package 置いていると発生する
-  - add folder to workspace で root になるようにしてやれば OK
 
 ## links
 
@@ -99,14 +86,3 @@ EOF
 # after restart
 go version
 ```
-
-## 環境変数
-
-- GOPATH: go が path 解決する際に root として扱うディレクトリ(ワークスペース)
-  - 配下に package やバイナリ、開発コードが存在することが前提として動作する
-  - 利用可能なディレクトリであればどこでも OK
-  - os(process)ごとに１つしか指定できない
-    - (開発元の異なるなど)ディレクトリを分けたい場合逐一切り替える必要あり
-- GOROOT: よくわからないが、go 本体のインストールパスが割り当てられていた
-  - GOROOT の設定は不要との記事は散見する。実際しなくて問題ない
-- GOBIN: built 時の install 先 (指定しなければ `${GOPATH}/bin` になるっぽい)
