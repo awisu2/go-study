@@ -33,16 +33,18 @@ var (
 )
 
 // コマンド作成(一番topのコマンドは(通常)rootCmdと呼ぶ)
+// サブコマンドがある場合のおすすめ: Run[E] (おまけで Use) を指定しない場合、コマンドなしの場合helpが出るうになる
 var rootCmd = &cobra.Command{
 	Use:   "sample",
 	Short: "short description",
 	Long:  `long description`,
 	Args:  cobra.ArbitraryArgs, // 引数設定(ArbitraryArgs: なんでもOK)
 	// argsには下記で設定しているflag引数("-x arg")以外の値がセットされる
-	Run: func(cmd *cobra.Command, args []string) {
+	RunE: func(cmd *cobra.Command, args []string) error {
 		_arg1, _ := cmd.Flags().GetInt("num")
 		_arg2, _ := cmd.PersistentFlags().GetString("str")
 		fmt.Printf("arg1(var): %v, arg1: %v, arg2: %v, args: %v\n", arg1, _arg1, _arg2, args)
+    return nil
 	},
 }
 
@@ -93,6 +95,7 @@ func Execute() error {
 
 公式: [cobra package \- github\.com/spf13/cobra \- pkg\.go\.dev](https://pkg.go.dev/github.com/spf13/cobra#Command)
 
+- Run[E]とUseの省略: コマンド無しでhelp、第一コマンド名をサブコマンドのUseにできる(rootCmdにおすすめ)
 - Args: 引数の挙動を指定。エラーを返却するとRunが実行されない
   - cobra.OnlyValidArgs: 指定した引数以外があるとエラー
     - 別途ValidArgsを設定しておく必要あり、ValidArgsFunctionで更に細かい設定も可能
