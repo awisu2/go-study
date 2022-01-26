@@ -17,6 +17,67 @@ study cobra, golang cli module
   - 優位点としては、viperとも連携できること。packageへの分割が前提として考慮されており見通しが良いことなどが挙げられる
 - viper(config系module), flag と共存することも可能
 
+### 参考コード
+
+```go
+package cmd
+
+import (
+	"fmt"
+
+	"github.com/spf13/cobra"
+)
+
+var (
+	arg1 int
+)
+
+// コマンド作成(一番topのコマンドは(通常)rootCmdと呼ぶ)
+var rootCmd = &cobra.Command{
+	Use:   "sample",
+	Short: "short description",
+	Long:  `long description`,
+	Args:  cobra.ArbitraryArgs, // 引数設定(ArbitraryArgs: なんでもOK)
+	// argsには下記で設定しているflag引数("-x arg")以外の値がセットされる
+	Run: func(cmd *cobra.Command, args []string) {
+		_arg1, _ := cmd.Flags().GetInt("num")
+		_arg2, _ := cmd.PersistentFlags().GetString("str")
+		fmt.Printf("arg1(var): %v, arg1: %v, arg2: %v, args: %v\n", arg1, _arg1, _arg2, args)
+	},
+}
+
+// サブコマンド: ごちゃつくのでほかファイルに
+var subCmd = &cobra.Command{
+	Use: "sub",
+	Run: func(cmd *cobra.Command, args []string) {
+	},
+}
+
+// go 標準関数: 実行時に処理
+func init() {
+	// 引数が解析されたあと、Runの実行前に実行されるイベント設定
+	cobra.OnInitialize(initConfig)
+
+	// 引数設定
+	rootCmd.Flags().IntVarP(&arg1, "num", "n", 99, "arg1 number")
+	rootCmd.PersistentFlags().StringP("str", "s", "abc", "arg2 string")
+	rootCmd.MarkPersistentFlagRequired("str") // 必須指定
+
+	// 配下コマンドの追加
+	rootCmd.AddCommand(subCmd)
+}
+
+func initConfig() {
+	// viper(config値/ファイルに強いmodule)などを実行
+}
+
+// 参考実装では、cmd.Execute()で実行できるようにしている
+func Execute() error {
+	return rootCmd.Execute()
+}
+```
+
+
 ## 実装
 
 - サンプルコード: [cmd/root.go](./cmd/root.go)
@@ -31,31 +92,6 @@ study cobra, golang cli module
 ## cobra.Commandのもうちょっと細かい話
 
 公式: [cobra package \- github\.com/spf13/cobra \- pkg\.go\.dev](https://pkg.go.dev/github.com/spf13/cobra#Command)
-
-ざっくりサンプルコード
-
-```go
-var rootCmd = &cobra.Command{
-	Use:   "sample", // コマンド名(ここでは "{go run .} sample" となる)
-	Short: "short description", // 簡易説明
-	Long:  `long description`, // 詳細説明
-	Args: cobra.OnlyValidArgs,
-
-	// 実行コマンド
-	RunE: func(cmd *cobra.Command, args []string) error {
-    // 引数の取得(flag式)
-		author, _ := cmd.Flags().GetString("author")
-		config, _ := cmd.PersistentFlags().GetString("config")
-		log.Printf("author: %v, config: %v\n", author, config)
-
-    return nil
-  }
-  // or
-	Run: func(cmd *cobra.Command, args []string) {
-    ...
-	},
-}
-```
 
 - Args: 引数の挙動を指定。エラーを返却するとRunが実行されない
   - cobra.OnlyValidArgs: 指定した引数以外があるとエラー
@@ -82,29 +118,6 @@ var rootCmd = &cobra.Command{
 ### 引数、配下コマンド設定
 
 - 公式: [pflag package \- github\.com/spf13/pflag \- pkg\.go\.dev](https://pkg.go.dev/github.com/spf13/pflag#FlagSet)
-
-ざっくりサンプル
-
-```go
-func init() {
-	// 引数の処理後(cobra.Command.Runの前)に実行されるイベント
-	cobra.OnInitialize(initConfig)
-
-	// 1. --author or -a の引数設定
-	// 値取方法: `cmd.Flags().GetString("author")` ショートハンド名("a")では取得できない
-	rootCmd.Flags().StringP("author", "a", "YOUR NAME", "author name for copyright attribution")
-
-	// 2. 配下に引き継がれる引数指定(Persistent)、引数へのセット式(xxxVar)、+ 必須指定(Requiredを付与)
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.cobra.yaml)")
-	rootCmd.MarkPersistentFlagRequired("config")
-
-	rootCmd.PersistentFlags().StringVarP(&userLicense, "license", "l", "", "name of license for the project")
-	rootCmd.PersistentFlags().Bool("viper", true, "use Viper for configuration")
-
-	// 配下コマンドの追加
-	rootCmd.AddCommand(tryCmd)
-}
-```
 
 - int()の実行順序: コンパイラに渡された順序とのこと
   - 実質順序不明なので気にしないでいいように書くこと
