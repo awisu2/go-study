@@ -16,6 +16,8 @@ study cobra, golang cli module
   - [akamensky/argparse: Argparse for golang. Just because `flag` sucks](https://github.com/akamensky/argparse)
   - 優位点としては、viperとも連携できること。packageへの分割が前提として考慮されており見通しが良いことなどが挙げられる
 - viper(config系module), flag と共存することも可能
+- RunEを利用すべきか？: エラー時の処理を決めていない場合は、Runで良いと思われる
+  - 個々のコマンドでエラー条件が変わるため、エラーを返してどうするという問題が残る
 
 ### 参考コード
 
@@ -40,11 +42,10 @@ var rootCmd = &cobra.Command{
 	Long:  `long description`,
 	Args:  cobra.ArbitraryArgs, // 引数設定(ArbitraryArgs: なんでもOK)
 	// argsには下記で設定しているflag引数("-x arg")以外の値がセットされる
-	RunE: func(cmd *cobra.Command, args []string) error {
+	Run: func(cmd *cobra.Command, args []string) {
 		_arg1, _ := cmd.Flags().GetInt("num")
 		_arg2, _ := cmd.PersistentFlags().GetString("str")
 		fmt.Printf("arg1(var): %v, arg1: %v, arg2: %v, args: %v\n", arg1, _arg1, _arg2, args)
-    return nil
 	},
 }
 
