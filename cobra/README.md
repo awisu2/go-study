@@ -30,30 +30,31 @@ import (
 	"github.com/spf13/cobra"
 )
 
-var (
+var params = struct {
 	arg1 int
-)
+}{}
 
 // コマンド作成(一番topのコマンドは(通常)rootCmdと呼ぶ)
-// サブコマンドがある場合のおすすめ: Run[E] (おまけで Use) を指定しない場合、コマンドなしの場合helpが出るうになる
-var rootCmd = &cobra.Command{
+// rootにサブコマンドがある場合のおすすめ: Useの設定を消す
+//   Run[E] を指定しない場合 helpが出る。(ただし help の command 一覧には出ない)
+//   rootCmd の Use の特殊挙動: コマンド実行時に指定するとサブコマンドの有無に関わらず強制実行される
+var Cmd = &cobra.Command{
 	Use:   "sample",
 	Short: "short description",
-	Long:  `long description`,
 	Args:  cobra.ArbitraryArgs, // 引数設定(ArbitraryArgs: なんでもOK)
 	// argsには下記で設定しているflag引数("-x arg")以外の値がセットされる
 	Run: func(cmd *cobra.Command, args []string) {
 		_arg1, _ := cmd.Flags().GetInt("num")
 		_arg2, _ := cmd.PersistentFlags().GetString("str")
-		fmt.Printf("arg1(var): %v, arg1: %v, arg2: %v, args: %v\n", arg1, _arg1, _arg2, args)
+		fmt.Printf("arg1(var): %v, arg1: %v, arg2: %v, args: %v\n", params.arg1, _arg1, _arg2, args)
+
+    // helpを出力 (エラー/空コマンド用)
+    // cmd.Help()
 	},
 }
 
-// サブコマンド: ごちゃつくのでほかファイルに
-var subCmd = &cobra.Command{
-	Use: "sub",
-	Run: func(cmd *cobra.Command, args []string) {
-	},
+func initConfig() {
+	// viper(config値/ファイルに強いmodule)などを実行
 }
 
 // go 標準関数: 実行時に処理
@@ -62,21 +63,36 @@ func init() {
 	cobra.OnInitialize(initConfig)
 
 	// 引数設定
-	rootCmd.Flags().IntVarP(&arg1, "num", "n", 99, "arg1 number")
-	rootCmd.PersistentFlags().StringP("str", "s", "abc", "arg2 string")
-	rootCmd.MarkPersistentFlagRequired("str") // 必須指定
+	flags, pFlags := Cmd.Flags(), Cmd.PersistentFlags()
+
+	flags.IntVarP(&params.arg1, "num", "n", 99, "arg1 number")
+	pFlags.StringP("str", "s", "abc", "arg2 string")
+
+	// 必須指定
+	requireds := []string{"output", "width", "height"}
+	persistentRequireds := []string{}
+	for _, required := range requireds {
+		Cmd.MarkFlagRequired(required)
+	}
+	for _, required := range persistentRequireds {
+		Cmd.MarkPersistentFlagRequired(required)
+	}
 
 	// 配下コマンドの追加
-	rootCmd.AddCommand(subCmd)
-}
-
-func initConfig() {
-	// viper(config値/ファイルに強いmodule)などを実行
+	Cmd.AddCommand(subCmd)
 }
 
 // 参考実装では、cmd.Execute()で実行できるようにしている
 func Execute() error {
-	return rootCmd.Execute()
+	return Cmd.Execute()
+}
+
+// サブコマンド: ごちゃつくのでほかファイルに(可能な限り他パッケージで)
+var subCmd = &cobra.Command{
+	Use: "sub",
+	Run: func(cmd *cobra.Command, args []string) {
+		fmt.Println("")
+	},
 }
 ```
 
