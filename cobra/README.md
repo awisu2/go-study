@@ -7,7 +7,7 @@ study cobra, golang cli module
 
 ## 残タスク
 
-- [] viperとの連携
+- [] viperとの連携の細かい解説(必要になったら)
 - [] なぜinit()で記載しているのか？
 
 ## 簡単解説
@@ -18,6 +18,9 @@ study cobra, golang cli module
 - viper(config系module), flag と共存することも可能
 - RunEを利用すべきか？: エラー時の処理を決めていない場合は、Runで良いと思われる
   - 個々のコマンドでエラー条件が変わるため、エラーを返してどうするという問題が残る
+- viperとの連携: 細かいことは省くが、viperに値を寄せていく感じ。
+ - [spf13/viper: Go configuration with fangs](https://github.com/spf13/viper#working-with-flags)
+ - [cobra/user\_guide\.md at master · spf13/cobra](https://github.com/spf13/cobra/blob/master/user_guide.md#create-rootcmd)
 
 ### 参考コード
 
