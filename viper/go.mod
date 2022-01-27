@@ -1,4 +1,4 @@
-module go-study/viper
+module github.com/awisu2/go-study/viper
 
 go 1.13
 

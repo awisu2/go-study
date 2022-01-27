@@ -2,43 +2,51 @@ package main
 
 import (
 	"fmt"
-	"log"
 
 	"github.com/spf13/viper"
 )
 
-
-type ConfigB struct {
-	B2 int `yaml:"b2"`
-
-}
-
 type Config struct {
-	A string `yaml:"a"`
-	B *ConfigB `yaml:"b"`
-	
+	ContentDir string
+	B          string
 }
 
 func main() {
-	viper.SetConfigName("config") // name of config file (without extension)
-	viper.SetConfigType("yaml") // REQUIRED if the config file does not have the extension in the name
+	sampleReadEnv()
+}
 
-	// ファイルを検索するパス
-	// viper.AddConfigPath("/etc/appname/")
-	viper.AddConfigPath(".") // current directory
+func sampleSetDefault(def string) string {
+	// set default
+	viper.SetDefault("mykey", def)
 
-	viper.AutomaticEnv()
+	// get value
+	return viper.GetString("mykey")
+}
 
-	err := viper.ReadInConfig() // Find and read the config file
-	if err != nil { // Handle errors reading the config file
-		panic(fmt.Errorf("Fatal error config file: %w \n", err))
+func sampleReadFile() Config {
+	/* read file
+	 * ConfigPathは複数指定できるが、読み込む(管理する)ファイルは1つだけ
+	 */
+	viper.SetConfigName("config.json") // file name
+	viper.SetConfigType("json")        // ファイル名に拡張子がないときに必要
+	viper.AddConfigPath("./")          // target directory
+	err := viper.ReadInConfig()
+	fmt.Println("----- a")
+	if err != nil {
+		panic(fmt.Errorf("Fatal error config file. %w \n", err))
 	}
 
-	a := viper.GetString("a")
-	log.Println(a)
-
-	// structに読み込む
+	// read to struct
 	var config Config
 	viper.Unmarshal(&config)
-	log.Println(config, config.B) // {A 0xc000024a88} &{21}
+
+	return config
+}
+
+func sampleReadEnv() string {
+	/* read from environment
+	 * 実行サンプル: `B=abc go run .`
+	 */
+	viper.AutomaticEnv()
+	return viper.GetString("B")
 }
