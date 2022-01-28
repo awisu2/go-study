@@ -1,3 +1,4 @@
 {
-  "contentDir": "sampletext"
+  "contentDir": "sampletext",
+  "B": "b from config.json"
 }

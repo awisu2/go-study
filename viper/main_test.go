@@ -27,3 +27,11 @@ func TestSampleREadEnv(t *testing.T) {
 		t.Errorf("got => %v, want 'abcd'", got)
 	}
 }
+
+func TestSampleREadEnvAndConfig(t *testing.T) {
+	t.Setenv("B", "abcd")
+	got := sampleReadEnvAndConfig()
+	if got != "abcd" {
+		t.Errorf("got => %v, want 'abcd'", got)
+	}
+}

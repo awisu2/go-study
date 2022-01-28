@@ -31,7 +31,6 @@ func sampleReadFile() Config {
 	viper.SetConfigType("json")        // ファイル名に拡張子がないときに必要
 	viper.AddConfigPath("./")          // target directory
 	err := viper.ReadInConfig()
-	fmt.Println("----- a")
 	if err != nil {
 		panic(fmt.Errorf("Fatal error config file. %w \n", err))
 	}
@@ -48,5 +47,23 @@ func sampleReadEnv() string {
 	 * 実行サンプル: `B=abc go run .`
 	 */
 	viper.AutomaticEnv()
+	return viper.GetString("B")
+}
+
+// 環境変数からの取得と、configファイルからの取得を同時に行う
+// 環境変数が優先され、上書きされる
+func sampleReadEnvAndConfig() string {
+	// get from environments
+	viper.AutomaticEnv()
+
+	// get from config file
+	viper.SetConfigName("config.json") // file name
+	viper.SetConfigType("json")        // ファイル名に拡張子がないときに必要
+	viper.AddConfigPath("./")          // target directory
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(fmt.Errorf("Fatal error config file. %w \n", err))
+	}
+
 	return viper.GetString("B")
 }
