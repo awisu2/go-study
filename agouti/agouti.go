@@ -60,6 +60,9 @@ func sampleGetTitle(url string, opt *DriverOption) (string, error) {
 		return "", err
 	}
 
+	// select処理のサンプル
+	sampleSelect(page)
+
 	return title, nil
 }
 
@@ -139,4 +142,65 @@ func analyzeHtml(html string) (string, error) {
 	}
 
 	return selection.Text(), nil
+}
+
+// 要素取得サンプル
+//
+// ダイレクトにerrorチェックをする方法が無いため、countでエラーチェック(見つからないのも通常挙動だから？)
+//
+func sampleSelect(page *agouti.Page) {
+	// find ----------
+	// 一つだけ存在することを前提として検索(存在しない/複数存在するの両方でエラー)
+	{
+		// success(１つのみ存在するため成功)
+		s := page.Find("title")
+		if _, err := s.Count(); err != nil {
+			log.Printf("error %v\n", err)
+		}
+	}
+
+	{
+		// error(複数存在するためエラー)
+		s := page.Find("div")
+		if _, err := s.Count(); err != nil {
+			log.Printf("error %v\n", err)
+		}
+	}
+
+	{
+		// error(存在しないためエラー)
+		s := page.Find("xyz")
+		if _, err := s.Count(); err != nil {
+			log.Printf("error %v\n", err)
+		}
+	}
+
+	// First ----------
+	{
+		// success
+		s := page.First("div")
+		if _, err := s.Count(); err != nil {
+			log.Printf("error %v\n", err)
+		}
+	}
+
+	{
+		// success
+		s := page.First("input.gLFyf.gsfi")
+		if _, err := s.Count(); err != nil {
+			log.Printf("error %v\n", err)
+		} else {
+			// input value に値をセット
+			s.Fill("mmmmmm")
+		}
+	}
+
+	// All ----------
+	{
+		// success
+		s := page.All("div")
+		if _, err := s.Count(); err != nil {
+			log.Printf("error %v\n", err)
+		}
+	}
 }
