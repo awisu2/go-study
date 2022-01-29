@@ -28,3 +28,9 @@ func find() {
 	_s := ReExt.FindString(s)
 	log.Println(s, _s) // image.jpg .jpg
 }
+
+// 正規表現で文字列置換
+func replace(src string, reg string, repl string) string{
+	re := regexp.MustCompile(reg)
+	return re.ReplaceAllString(src, repl)
+}
