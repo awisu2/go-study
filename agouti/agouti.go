@@ -18,16 +18,17 @@ const (
 )
 
 type DriverOption struct {
-	Headless bool // ヘッドメニューを非表示(max/linuxのみ)
-	Width    int  // 幅
-	Height   int  // 高さ
+	Headless    bool   // ヘッドメニューを非表示(max/linuxのみ)
+	Width       int    // 幅
+	Height      int    // 高さ
+	UserDataDir string // ユーザデータを再利用する(絶対パスで指定)
 }
 
 func (opt *DriverOption) FixDefault() {
 }
 
 // chrome driverを起動時、5秒待機その後、タイトルを返却
-func getTitle(url string, opt *DriverOption) (string, error) {
+func sampleGetTitle(url string, opt *DriverOption) (string, error) {
 	// ドライバを作成し、起動
 	driver := createChromeDriver(DRIVER_CHROME, opt)
 	if err := driver.Start(); err != nil {
@@ -46,35 +47,20 @@ func getTitle(url string, opt *DriverOption) (string, error) {
 
 	// スクリプトを実行
 	var result interface{}
-	if err := runAlert(page, "hello world", &result); err != nil {
+	if err := runConsole(page, "hello world", &result); err != nil {
 		log.Panic(err)
 	}
 	log.Println(result)
 
 	time.Sleep(time.Second * 5)
 
-	// HTMlを取得
-	html, err := page.HTML()
-	if err != nil {
-		return "", err
-	}
-	// htmlを解析してタイトル取得
-	title1, err := getTitlefromHtml(html)
+	// タイトルの取得
+	title, err := getTitle(page)
 	if err != nil {
 		return "", err
 	}
 
-	// タイトルを取得
-	title2, err := page.Title()
-	if err != nil {
-		return "", err
-	}
-
-	if title1 != title2 {
-		return "", fmt.Errorf("not equal title. %v, %v", title1, title2)
-	}
-
-	return title1, nil
+	return title, nil
 }
 
 func createChromeDriver(driver Driver, opt *DriverOption) *agouti.WebDriver {
@@ -85,6 +71,9 @@ func createChromeDriver(driver Driver, opt *DriverOption) *agouti.WebDriver {
 	}
 	if opt.Width > 0 && opt.Height > 0 {
 		args = append(args, fmt.Sprintf("--window-size=%d,%d", opt.Width, opt.Height))
+	}
+	if opt.UserDataDir != "" {
+		args = append(args, fmt.Sprintf("--user-data-dir=%s", opt.UserDataDir))
 	}
 
 	log.Printf("%v\n", args)
@@ -98,16 +87,44 @@ func createChromeDriver(driver Driver, opt *DriverOption) *agouti.WebDriver {
 
 // スクリプトの実行
 //
-// どちらもpageにスクリプトと変数を割り当てるだけで、動作はjavascript
-// よって、alert('$word') にすると文字列扱いになりalertは "$word" が出力される
-func runAlert(page *agouti.Page, word string, result *interface{}) error {
-	body := "alert($word);"
+// pageにスクリプトと変数を割り当てるだけで、動作はjavascriptまかせ
+// よって、console.log('$word') にすると文字列扱いになり "$word" が出力される
+// goでカバーするなら、argumentsは空でも良い
+func runConsole(page *agouti.Page, word string, result *interface{}) error {
+	body := "console.log($word);"
 	arguments := map[string]interface{}{"$word": word}
 	return page.RunScript(body, arguments, result)
 }
 
+func getTitle(page *agouti.Page) (string, error) {
+	// agoutiの機能で、タイトルを取得 ----------
+	title1, err := page.Title()
+	if err != nil {
+		return "", err
+	}
+
+	// goqueryを利用してタイトル取得 ----------
+	// HTMlを取得
+	html, err := page.HTML()
+	if err != nil {
+		return "", err
+	}
+	// htmlを解析してタイトル取得
+	title2, err := analyzeHtml(html)
+	if err != nil {
+		return "", err
+	}
+
+	// それぞれの方法で違いがないかチェック ----------
+	if title1 != title2 {
+		return "", fmt.Errorf("not equal title. %v, %v", title1, title2)
+	}
+
+	return title1, nil
+}
+
 // qoqueryにより、htmlを解析してtitle取得
-func getTitlefromHtml(html string) (string, error) {
+func analyzeHtml(html string) (string, error) {
 	// documentを取得
 	doc, err := goquery.NewDocumentFromReader(strings.NewReader(html))
 	if err != nil {

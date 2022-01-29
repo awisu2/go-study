@@ -2,11 +2,13 @@ package agouti
 
 import (
 	"fmt"
+	"path/filepath"
 	"testing"
 )
 
 func TestGetTitle(t *testing.T) {
-	title, err := getTitle("https://www.google.com/?hl=ja", &DriverOption{Height: 600, Width: 300})
+	userData, _ := filepath.Abs("./tmp/userData")
+	title, err := sampleGetTitle("https://www.google.com/?hl=ja", &DriverOption{Height: 400, Width: 100, UserDataDir: userData})
 	if err != nil {
 		t.Errorf("any error happen. %v", err)
 	}
