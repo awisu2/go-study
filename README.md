@@ -6,6 +6,8 @@
 
 - [basics](./docs/basics.md): インストールや基本事項
 - [module](./docs/module.md): module の取り扱いについて(get/install コマンドなど)
+  - 追記: privte github から go getする方法
+- [特殊ディレクトリ](./docs/specialDirectory.md): 特殊ディレクトリの取得
 
 ## contents
 

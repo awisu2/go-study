@@ -18,3 +18,45 @@
 - `go get`, `go install` されたモジュールの行き先
   - GOPATH 配下にバージョン毎にディレクトリに保存されており、必要なときに再利用される
   - [] TODO: 最新化の方法
+
+## private github から `go get` する
+
+ポイントはこちら
+
+1. github の httpsアクセス時に personal access tokensを噛ませて、privateでも通るようにする
+   - go get は httpsアクセスをしているとのこと。まずはgithubの設定
+2. GOPRIVATE 環境変数に対象のmodule名を登録
+   - 自分のであれば, "github.com/awisu2/*" またはいつもgoを頭につけるので "github.com/awisu2/go*"
+     - "," 区切りで複数設定可能、メタ文字が効くらしい
+
+### 実践
+
+personal access tokens を githubで発行
+
+[個人アクセストークンを使用する - GitHub Docs](https://docs.github.com/ja/github/authenticating-to-github/keeping-your-account-and-data-secure/creating-a-personal-access-token)
+
+gitに設定
+
+```bash
+TOKEN="{githubAccessToken}"
+git config --global url."https://${TOKEN}:x-oauth-basic@github.com/".insteadOf "https://github.com/"
+```
+
+
+f: ~/.gitconfig
+
+以下の設定が追加される
+
+```gitconfig
+...
+[url "https://{githubAccessToken}:x-oauth-basic@github.com/"]
+        insteadOf = https://github.com/
+```
+
+ここまで、githubは通っているがgoのセキュリティでストップする。
+環境変数 GOPRIVATE に許可するmoduleのパターンを設定
+
+```bash
+echo $GOPRIVATE
+github.com/awisu2/*
+```

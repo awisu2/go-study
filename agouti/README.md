@@ -11,6 +11,9 @@ golang でのブラウザコントロール API サポート
 
 - 特定のブラウザドライバーをコントロールするため、事前にドライバのインストールが必要
   - chrome: [ChromeDriver \- WebDriver for Chrome \- Downloads](https://chromedriver.chromium.org/downloads)
+  - *failed to navigate: request unsuccessful: invalid session id*
+    - インストールされているchromeとドライバのバージョンが違うと発生する。(最新ドライバではない)
+    - Driverの生成時ではなくNavigate()を実行したときにNavigateの失敗としてエラーがでる
 
 ## toto
 
