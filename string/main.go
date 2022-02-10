@@ -1,6 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"fmt"
+	"strings"
+)
 
 // それぞれの文字コードに加算をして返却
 func AddCodeEachWord(input string, add rune) string {
@@ -21,9 +24,16 @@ func sample() {
 	fmt.Println("abc"[1:3]) // bc
 
 	// code print
+	s := "xaybx"
 	for i, code := range "abc" {
-		fmt.Printf("%d: %v\n", i, code)
+		fmt.Printf("%d: %c\n", i, code)
+		s = strings.ReplaceAll(s, string(code), "=")
 	}
+	fmt.Println(s) // x=y=z
+
+
+	fmt.Println(strings.Replace("aaaa", "a", "b", 2)) // bbaa
+	fmt.Println(strings.Replace("aaaa", "a", "b", -1)) // bbbb
 }
 
 func main() {
