@@ -20,6 +20,7 @@
 - [images](./images): imags
 - [json](./json): json への変換及びデコード時処理
 - [pointer-behavior](./pointer-behavior): 各種値の参照の取り扱い
+- [path](./path): path の取り扱い
 - [regexp](./regexp): 正規表現
 - [sharedGo](./sharedGo): node の native モジュールで動作させることを目標とした実験
 - [struct](./struct): struct 構造体
