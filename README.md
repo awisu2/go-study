@@ -6,7 +6,7 @@
 
 - [basics](./docs/basics.md): インストールや基本事項
 - [module](./docs/module.md): module の取り扱いについて(get/install コマンドなど)
-  - 追記: privte github から go getする方法
+  - 追記: privte github から go get する方法
 - [特殊ディレクトリ](./docs/specialDirectory.md): 特殊ディレクトリの取得
 
 ## contents
@@ -23,6 +23,7 @@
 - [regexp](./regexp): 正規表現
 - [sharedGo](./sharedGo): node の native モジュールで動作させることを目標とした実験
 - [struct](./struct): struct 構造体
+- [string](./string): string の取り扱い
 - [time](./time): time
 - [test](./test): test
 - [tour-of-go](./tour-of-go): tour-of-go 用
