@@ -16,6 +16,7 @@
 - [array-slice](./array-slice): array/slice
 - [goroutine](./goroutine): goroutine
 - [helloworld](./helloworld): hello world !
+- [file](./file): file
 - [interface](./interface): interface
 - [images](./images): imags
 - [json](./json): json への変換及びデコード時処理

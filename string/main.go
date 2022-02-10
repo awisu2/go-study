@@ -5,7 +5,7 @@ import (
 	"strings"
 )
 
-// それぞれの文字コードに加算をして返却
+// add rune (like ascii code) each word
 func AddCodeEachWord(input string, add rune) string {
 	out := ""
 	for _, code := range input {
@@ -31,7 +31,7 @@ func sample() {
 	}
 	fmt.Println(s) // x=y=z
 
-
+	// replace
 	fmt.Println(strings.Replace("aaaa", "a", "b", 2)) // bbaa
 	fmt.Println(strings.Replace("aaaa", "a", "b", -1)) // bbbb
 }
