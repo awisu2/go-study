@@ -34,20 +34,32 @@
 
 ### 各種 module を使ってみる
 
-- [agouti](./agouti): ブラウザコントロール API サポート(テストや自動挙動確認用)
+- [getstart](./getstart): チュートリアル通りやってみた
+- [convert](./convert): 型変換実験場
+
+#### command line
+
 - [argparse](./argparse): コマンド実行時の引数解析 python に準拠
 - [cobra](./cobra): コマンドライン構築サポート (階層的コマンド、help の自動補完、及び viper との連携などが強力)
-- [convert](./convert): 型変換実験場
+- [viper](./viper): コンフィグ値の取り扱い(環境変数や特定の config ファイルからの取得など, cobra との連携も可能)
+
+#### web
+
 - [echo](./echo): web フレームワーク
 - [echo-jwt](./echo-jwt): echo で jwt 認証
 - [echo-middleware](./echo-middleware): echo の middleware
-- [getstart](./getstart): チュートリアル通りやってみた
+- [server-echo](./server-echo): echo を実際利用するため色々構築
+
+#### db
+
 - [gorm](./gorm): ORM ライブラリ
 - [gorm-simple](./gorm-simple): gorm のかんたん実装
+
+#### gui
+
+- [agouti](./agouti): ブラウザコントロール API サポート(テストや自動挙動確認用)
 - [gui-fyne](./gui-fyne): go の gui ライブラリ fyne
 - [lorca](./lorca): go の gui ライブラリ lorca
-- [server-echo](./server-echo): echo を実際利用するため色々構築
-- [viper](./viper): コンフィグ値の取り扱い(環境変数や特定の config ファイルからの取得など, cobra との連携も可能)
 
 ## links
 
