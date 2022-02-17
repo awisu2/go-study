@@ -30,9 +30,12 @@ func TestOpen(t *testing.T) {
 		t.Errorf("%v", err)
 	}
 
-	_, err = Open(createOption.Path)
+	_, format, err := Open(createOption.Path)
 	if err != nil {
 		t.Errorf("%v", err)
+	}
+	if format != "png" {
+		t.Errorf("got %v want %s", format, "png")
 	}
 }
 
@@ -42,7 +45,7 @@ func TestResize(t *testing.T) {
 	if err != nil {
 		t.Errorf("%v", err)
 	}
-	img, err := Open(createOption.Path)
+	img, _, err := Open(createOption.Path)
 	if err != nil {
 		t.Errorf("%v", err)
 	}

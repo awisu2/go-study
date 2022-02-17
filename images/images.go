@@ -23,6 +23,11 @@ type CreateOption struct {
 	Color color.Color
 }
 
+type ImageInfo struct {
+	Width  int
+	Height int
+}
+
 func CreateImage(size *Size) *image.RGBA {
 	img := image.NewRGBA(image.Rect(0, 0, size.Width, size.Height))
 	return img
@@ -62,19 +67,19 @@ func Save(img image.Image, option *SaveOption) (err error) {
 }
 
 // 特定のファイルを読み込み
-func Open(path string) (image.Image, error) {
+func Open(path string) (image.Image, string, error) {
 	f, err := os.Open(path)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 	defer f.Close()
 
-	image, _, err := image.Decode(f)
+	image, format, err := image.Decode(f)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	return image, nil
+	return image, format, nil
 }
 
 // 画像のリサイズ
@@ -105,4 +110,14 @@ func SetRgbas(img *image.RGBA, dr image.Rectangle, color color.Color) {
 // 全範囲に色をセット
 func SetRgbasFull(img *image.RGBA, color color.Color) {
 	SetRgbas(img, img.Bounds(), color)
+}
+
+// get image info
+func Info(img *image.Image) ImageInfo {
+	size := (*img).Bounds()
+
+	return ImageInfo{
+		Width:  size.Dx(),
+		Height: size.Dy(),
+	}
 }
