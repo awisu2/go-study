@@ -8,6 +8,7 @@
 - [module](./docs/module.md): module の取り扱いについて(get/install コマンドなど)
   - 追記: privte github から go get する方法
 - [特殊ディレクトリ](./docs/specialDirectory.md): 特殊ディレクトリの取得
+- [rough code](./rough/rough.go): basic sample code
 
 ## contents
 
