@@ -12,18 +12,20 @@
 
 ## contents
 
-### 基本動作
+### basic
 
 - [array-slice](./array-slice): array/slice
 - [goroutine](./goroutine): goroutine
 - [helloworld](./helloworld): hello world !
 - [file](./file): file
+- [godoc](./godoc-study/): `go doc` command
 - [interface](./interface): interface
 - [images](./images): imags
 - [json](./json): json への変換及びデコード時処理
 - [pointer-behavior](./pointer-behavior): 各種値の参照の取り扱い
 - [path](./path): path の取り扱い
 - [regexp](./regexp): 正規表現
+- [runtime](./runtime-study/): rutime. (ex: what os, architecture running.)
 - [sharedGo](./sharedGo): node の native モジュールで動作させることを目標とした実験
 - [struct](./struct): struct 構造体
 - [string](./string): string の取り扱い
@@ -50,6 +52,12 @@
 - [echo-jwt](./echo-jwt): echo で jwt 認証
 - [echo-middleware](./echo-middleware): echo の middleware
 - [server-echo](./server-echo): echo を実際利用するため色々構築
+- gin
+- aero
+- revel
+- beego
+- goji
+- iris
 
 #### db
 
