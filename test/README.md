@@ -3,7 +3,17 @@
 [testing \- Go 言語](https://xn--go-hh0g6u.com/pkg/testing/)
 
 ```bash
+# ...: recuresive with current
+# -run: regexp search functions
 go test
+go test ./test/...
+go test ./test/... -run Testhello
+
+# with benchmark
+go test --bench
+# only benchmark
+# ^$: regexp's notation that excludes all. (nothing between start and end)
+go test -run ^$ --bench
 ```
 
 - テスト用のファイルは通常はビルド対象とならず test 時のみビルドされる

@@ -2,12 +2,15 @@ package main
 
 import (
 	"testing"
+	"fmt"
 )
 
 
-func TestAddCodeEachWord(t *testing.T) {
-    got := AddCodeEachWord("aあ1", 1)
-	if got != "bぃ2" {
-		t.Errorf("got %v. want bぃ2", got)
+func TestReadStdOut(t *testing.T) {
+	got, _ := ReadStdOut(func() {
+		fmt.Println("hello world")
+	})
+	if string(got) != "hello world\n" {
+		t.Errorf("not get hello world")
 	}
 }
