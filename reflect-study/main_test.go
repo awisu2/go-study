@@ -109,3 +109,13 @@ func readStdOut(f func()) ([]byte, error) {
 
 	return ioutil.ReadAll(r)
 }
+
+func TestValue(t *testing.T) {
+	v := reflect.ValueOf("a")
+	if v.Kind() != reflect.String {
+		t.Error("not string")
+	}
+	if v.String() != "a" {
+		t.Error("not a")
+	}
+}
