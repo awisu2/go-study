@@ -22,10 +22,12 @@
 - [interface](./interface): interface
 - [images](./images): imags
 - [json](./json): json への変換及びデコード時処理
+- [os](./os-study/): (ex: catch stdout)
 - [pointer-behavior](./pointer-behavior): 各種値の参照の取り扱い
 - [path](./path): path の取り扱い
 - [regexp](./regexp): 正規表現
 - [runtime](./runtime-study/): rutime. (ex: what os, architecture running.)
+- [reflection](./reflect-study/): for dynamic type
 - [sharedGo](./sharedGo): node の native モジュールで動作させることを目標とした実験
 - [struct](./struct): struct 構造体
 - [string](./string): string の取り扱い

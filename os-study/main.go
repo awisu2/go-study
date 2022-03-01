@@ -8,6 +8,9 @@ import (
 // read any function's stdout
 func ReadStdOut(f func()) ([]byte, error) {
 	stdout := os.Stdout
+	defer func() {
+		os.Stdout = stdout
+	}()
 
 	r, w, _ := os.Pipe()
 	os.Stdout = w
@@ -15,7 +18,6 @@ func ReadStdOut(f func()) ([]byte, error) {
 	f()
 
 	w.Close()
-	os.Stdout = stdout
 
 	return ioutil.ReadAll(r)
 }
