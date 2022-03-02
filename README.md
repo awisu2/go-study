@@ -2,8 +2,12 @@
 
 my go study
 
+- [The Go Programming Language](https://golang.org/)
+
 ## docs
 
+- [A Tour of Go](https://go-tour-jp.appspot.com/welcome/1)
+  - official and very good go's first study
 - [basics](./docs/basics.md): インストールや基本事項
 - [module](./docs/module.md): module の取り扱いについて(get/install コマンドなど)
   - 追記: privte github から go get する方法
@@ -73,11 +77,6 @@ my go study
 - [agouti](./agouti): ブラウザコントロール API サポート(テストや自動挙動確認用)
 - [gui-fyne](./gui-fyne): go の gui ライブラリ fyne
 - [lorca](./lorca): go の gui ライブラリ lorca
-
-## links
-
-- [The Go Programming Language](https://golang.org/)
-- [A Tour of Go](https://go-tour-jp.appspot.com/welcome/1)
 
 ## install
 
