@@ -39,41 +39,44 @@ var params = struct {
 	arg1 int
 }{}
 
-// コマンド作成(一番topのコマンドは(通常)rootCmdと呼ぶ)
-// rootにサブコマンドがある場合のおすすめ: Useの設定を消す
-//   Run[E] を指定しない場合 helpが出る。(ただし help の command 一覧には出ない)
-//   rootCmd の Use の特殊挙動: コマンド実行時に指定するとサブコマンドの有無に関わらず強制実行される
+// create command
 var Cmd = &cobra.Command{
 	Use:   "sample",
 	Short: "short description",
 	Args:  cobra.ArbitraryArgs, // 引数設定(ArbitraryArgs: なんでもOK)
-	// argsには下記で設定しているflag引数("-x arg")以外の値がセットされる
+	// can chooses `Run()` or `RunE()`
+	// args has cli parameters without has -{-str} option.
+	//
+	// get arg: cmd.Flags().GetInt("num")
+	// get persistent arg: cmd.PersistentFlags().GetString("str")
+	//
+	// show help: `cmd.Help()`
 	Run: func(cmd *cobra.Command, args []string) {
 		_arg1, _ := cmd.Flags().GetInt("num")
 		_arg2, _ := cmd.PersistentFlags().GetString("str")
 		fmt.Printf("arg1(var): %v, arg1: %v, arg2: %v, args: %v\n", params.arg1, _arg1, _arg2, args)
-
-    // helpを出力 (エラー/空コマンド用)
-    // cmd.Help()
+		// cmd.Help()
 	},
 }
 
+// run initialize like viper
 func initConfig() {
-	// viper(config値/ファイルに強いmodule)などを実行
 }
 
-// go 標準関数: 実行時に処理
+// execute at running.
 func init() {
-	// 引数が解析されたあと、Runの実行前に実行されるイベント設定
+	// run between parse arguments and run Command.Run()
 	cobra.OnInitialize(initConfig)
 
-	// 引数設定
-	flags, pFlags := Cmd.Flags(), Cmd.PersistentFlags()
-
+	// arguments
+	flags := Cmd.Flags()
 	flags.IntVarP(&params.arg1, "num", "n", 99, "arg1 number")
+
+	// persistent arguments
+	pFlags := Cmd.PersistentFlags()
 	pFlags.StringP("str", "s", "abc", "arg2 string")
 
-	// 必須指定
+	// require settings
 	requireds := []string{"output", "width", "height"}
 	persistentRequireds := []string{}
 	for _, required := range requireds {
@@ -83,16 +86,17 @@ func init() {
 		Cmd.MarkPersistentFlagRequired(required)
 	}
 
-	// 配下コマンドの追加
+	// add command
 	Cmd.AddCommand(subCmd)
 }
 
-// 参考実装では、cmd.Execute()で実行できるようにしている
+// Execute(): Tipycaly function name
 func Execute() error {
 	return Cmd.Execute()
 }
 
-// サブコマンド: ごちゃつくのでほかファイルに(可能な限り他パッケージで)
+// create other command.
+// (recomend) create on other package.
 var subCmd = &cobra.Command{
 	Use: "sub",
 	Run: func(cmd *cobra.Command, args []string) {
