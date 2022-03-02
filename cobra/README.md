@@ -43,7 +43,7 @@ var params = struct {
 var Cmd = &cobra.Command{
 	Use:   "sample",
 	Short: "short description",
-	Args:  cobra.ArbitraryArgs, // 引数設定(ArbitraryArgs: なんでもOK)
+	Args:  cobra.ArbitraryArgs, // arguments setting.(ArbitraryArgs: any value ok)
 	// can chooses `Run()` or `RunE()`
 	// args has cli parameters without has -{-str} option.
 	//
