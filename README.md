@@ -1,6 +1,6 @@
 # go-study
 
-自分用 go 勉強リポジトリです
+my go study
 
 ## docs
 
