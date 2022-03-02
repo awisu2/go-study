@@ -79,21 +79,6 @@
 - [The Go Programming Language](https://golang.org/)
 - [A Tour of Go](https://go-tour-jp.appspot.com/welcome/1)
 
-## commands
-
-go には module モードと、GOPATH モードがある。デフォルトでは module モードで、GOPATH モードは GOPATH 配下にすべてを詰め込む旧仕様。
-module モードにすることで、module のバージョンなどを分離できる。。。らしい。 go.mod がその役目？
-
-- init: `go mod init {domain/module}`
-- run: `go run .`
-- tidy mod: `go mod tidy`
-  - after writed `imoprt` in code
-- edit mod: `go mod edit {command}`
-  - replace module path: `go mod edit -replace example.com/greetings=../greetings`
-- build: `go build`
-  - check install path (it builded): `go list -f {{.Target}}`
-    - これを環境変数の PATH に入れておけばビルドしたコマンドが利用できる
-
 ## install
 
 [Download and install - The Go Programming Language](https://golang.org/doc/install)
