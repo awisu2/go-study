@@ -15,6 +15,8 @@
 ### basic
 
 - [array-slice](./array-slice): array/slice
+- [callback](./callback-study/): callback functions
+- [commands](./commands/): go commands like `go run .`, `go build .`
 - [goroutine](./goroutine): goroutine
 - [helloworld](./helloworld): hello world !
 - [file](./file): file
