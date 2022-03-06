@@ -3,6 +3,7 @@
 my go study
 
 - [The Go Programming Language](https://golang.org/)
+- Clean Architecture: [bxcodec/go\-clean\-arch: Go \(Golang\) Clean Architecture based on Reading Uncle Bob's Clean Architecture](https://github.com/bxcodec/go-clean-arch)
 
 ## docs
 
@@ -14,9 +15,7 @@ my go study
 - [特殊ディレクトリ](./docs/specialDirectory.md): 特殊ディレクトリの取得
 - [rough code](./rough/rough.go): basic sample code
 
-## contents
-
-### basic
+## basic
 
 - [array-slice](./array-slice): array/slice
 - [callback](./callback-study/): callback functions
@@ -39,22 +38,21 @@ my go study
 - [string](./string): string の取り扱い
 - [switch](./switch-study): switch
 - [time](./time): time
-- [test](./test): test
 - [tour-of-go](./tour-of-go): tour-of-go 用
 - [url](./url): url の取り扱い
 
-### 各種 module を使ってみる
+## test
 
-- [getstart](./getstart): チュートリアル通りやってみた
-- [convert](./convert): 型変換実験場
+- [test](./test): test
+- [stretchr/testify: A toolkit with common assertions and mocks that plays nicely with the standard library](https://github.com/stretchr/testify)
 
-#### command line
+## command line
 
 - [argparse](./argparse): コマンド実行時の引数解析 python に準拠
 - [cobra](./cobra): コマンドライン構築サポート (階層的コマンド、help の自動補完、及び viper との連携などが強力)
 - [viper](./viper): コンフィグ値の取り扱い(環境変数や特定の config ファイルからの取得など, cobra との連携も可能)
 
-#### web
+## web framework
 
 - [echo](./echo): web フレームワーク
 - [echo-jwt](./echo-jwt): echo で jwt 認証
@@ -67,37 +65,18 @@ my go study
 - goji
 - iris
 
-#### db
+## db
 
 - [gorm](./gorm): ORM ライブラリ
 - [gorm-simple](./gorm-simple): gorm のかんたん実装
 
-#### gui
+## gui
 
 - [agouti](./agouti): ブラウザコントロール API サポート(テストや自動挙動確認用)
 - [gui-fyne](./gui-fyne): go の gui ライブラリ fyne
 - [lorca](./lorca): go の gui ライブラリ lorca
 
-## install
+## my try
 
-[Download and install - The Go Programming Language](https://golang.org/doc/install)
-
-### linux
-
-```bash
-# install
-GOFILE="go1.16.5.linux-amd64.tar.gz"
-cd
-wget https://golang.org/dl/${GOFILE}
-sudo rm -rf /usr/local/go
-sudo tar -C /usr/local -xzf ${GOFILE}
-
-# add path (if not exists)
-cat - << 'EOF' > ~/.bash_profile
-# go
-export PATH=$PATH:/usr/local/go/bin
-EOF
-
-# after restart
-go version
-```
+- [getstart](./getstart): チュートリアル通りやってみた
+- [convert](./convert): converting test

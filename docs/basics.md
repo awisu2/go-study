@@ -7,9 +7,32 @@
   - create mod: `go mod init {domain/module}`
   - update packages: `go mod tidy`
   - run mod: `go mod .`
+- 環境変数: 後述
 - [test](../test)
 - [getting start/hello world](../helloworld)
   - 公式の勉强環境: [A Tour of Go](https://go-tour-jp.appspot.com/welcome/1)
+
+## install
+
+### linux
+
+```bash
+# install
+GOFILE="go1.16.5.linux-amd64.tar.gz"
+cd
+wget https://golang.org/dl/${GOFILE}
+sudo rm -rf /usr/local/go
+sudo tar -C /usr/local -xzf ${GOFILE}
+
+# add path (if not exists)
+cat - << 'EOF' > ~/.bash_profile
+# go
+export PATH=$PATH:/usr/local/go/bin
+EOF
+
+# after restart
+go version
+```
 
 ## 環境変数
 
