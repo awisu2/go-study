@@ -48,9 +48,7 @@ my go study
 ## groutine, context, errgroup
 
 - [goroutine](./goroutine): goroutine
-- context: context it's can Canceling, Set timeout, and carrie values.
-  - [context package \- context \- pkg\.go\.dev](https://pkg.go.dev/context)
-  - [] What different of Background and TODO
+- [context](./context-study/): context it's can Canceling, Set timeout, and carrie values.
 - errgroup
   - [errgroup package \- golang\.org/x/sync/errgroup \- pkg\.go\.dev](https://pkg.go.dev/golang.org/x/sync/errgroup#ex-Group--Pipeline)
 
