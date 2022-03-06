@@ -20,7 +20,6 @@ my go study
 - [array-slice](./array-slice): array/slice
 - [callback](./callback-study/): callback functions
 - [commands](./commands/): go commands like `go run .`, `go build .`
-- [goroutine](./goroutine): goroutine
 - [helloworld](./helloworld): hello world !
 - [file](./file): file
 - [godoc](./godoc-study/): `go doc` command
@@ -44,7 +43,16 @@ my go study
 ## test
 
 - [test](./test): test
-- [stretchr/testify: A toolkit with common assertions and mocks that plays nicely with the standard library](https://github.com/stretchr/testify)
+- [testify](./testify-study/README.md): The testify is supporting test more simply, and add mock and suite.
+
+## groutine, context, errgroup
+
+- [goroutine](./goroutine): goroutine
+- context: context it's can Canceling, Set timeout, and carrie values.
+  - [context package \- context \- pkg\.go\.dev](https://pkg.go.dev/context)
+  - [] What different of Background and TODO
+- errgroup
+  - [errgroup package \- golang\.org/x/sync/errgroup \- pkg\.go\.dev](https://pkg.go.dev/golang.org/x/sync/errgroup#ex-Group--Pipeline)
 
 ## command line
 
