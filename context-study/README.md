@@ -15,3 +15,73 @@
   - The context cannot be saved in a persistent location as it can be deleted after use.
   - Not set in struct instance
   - Not set non clear variables(like global, static... etc)
+
+## sample
+
+- When declared with `WithCancel()`, the names are different, but usually the same name (`ctx`) to maintain the parent-child relationship.
+
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"time"
+)
+
+func contextDone(runCancel2 bool) {
+	ctx := context.Background()
+	ctxCancel1, cancel1 := context.WithCancel(ctx)
+	ctxCancel2, cancel2 := context.WithCancel(ctxCancel1)
+	defer func() {
+		cancel1()
+		cancel2()
+	}()
+
+	runGoroutine := func() <- chan int {
+		dst := make(chan int)
+		n := 1
+		go func() {
+			for {
+				select{
+				case <- ctx.Done():
+					fmt.Println("done base") // not run this
+				case <- ctxCancel1.Done():
+					fmt.Println("done cancel1")
+				case <- ctxCancel2.Done():
+					fmt.Println("done cancel2")
+					return
+				case dst <- n:
+					n++
+				}
+			}
+		}()
+		return dst
+	}
+
+	for range runGoroutine() {
+		if runCancel2 {
+			cancel2()
+		} else {
+			cancel1()
+		}
+		break
+	}
+
+	// for check ctx.Done()'s print
+	time.Sleep(1 * time.Second)
+}
+
+func main() {
+	fmt.Println("run cancel 1 ---------")
+	contextDone(false)
+	// done cancel1
+	// done cancel1
+	// ...
+	// done cancel2
+
+	fmt.Println("run cancel 2 ---------")
+	contextDone(true)
+	// done cancel2
+}
+```

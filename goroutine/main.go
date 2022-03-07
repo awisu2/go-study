@@ -6,88 +6,104 @@ import (
 )
 
 func main() {
-	// sampleHello()
-	// sampleChannel()
-	// sampleChannelLimit()
+	sampleHello()
+	sampleChannel()
+	sampleChannelBuffer()
 	// samplePingPong()
-	samplePingPong2()
+	// samplePingPong2()
 }
 
 func sampleHello() {
-	// 場合によっては、worldは出力されない (goroutineの処理が終わる前にプログラムが終わる)
-	go fmt.Println("world")
+	go func() {
+		fmt.Println("world")		
+	}()
 	fmt.Println("hello")
+	time.Sleep(1* time.Second) // If don't sleep, world will not output
+
 }
 
-// sample Channel
-// 値をチャンネルに送信できる
-
-func sum(nums []int, ch chan int) {
-	n := 0
-	for _, num := range nums {
-		n += num
-	}
-	// nをチャンネルに送信
-	ch <- n
-}
-
+// SampleChannel()
+// 
+// Channels can exchanged inside and outside goroutine
+//
+// Waiting for the channel to respond will stop the process. 
+// This means that if the channel does not return a response,
+// it will not run any further and will not complete
 func sampleChannel() {
-	// channel は　makeによって生成可能
-	var ch chan int = make(chan int)
+	// Create channel
+	var ch = make(chan int)
+
+	sum := func(nums []int, ch chan int) {
+		n := 0
+		for _, num := range nums {
+			n += num
+		}
+		ch <- n // send total to channel
+	}
 	go sum([]int{1, 2, 3}, ch)
 	go sum([]int{4, 5, 6}, ch)
-	go sum([]int{7}, ch)
-	go sum([]int{8}, ch)
-	go sum([]int{9}, ch)
-	go sum([]int{10}, ch)
-	// 結果は終わった順に格納される(ランダム)
-	x, y, z, a, b, c := <-ch, <-ch, <-ch, <-ch, <-ch, <-ch
+	go sum([]int{7, 8 , 9}, ch)
 
-	fmt.Printf("%d, %d, %d, %d, %d, %d\n", x, y, z, a, b, c)
+	// Stop until the channel return a response
+	//
+	// The order of the return values will be different each times,
+	// because they are set in the order of processing completion.
+	a := <-ch // wait 1th response
+	b, c := <-ch, <-ch // wati 2,3th response
+
+	fmt.Printf("%d, %d, %d\n", a, b, c)
 }
 
-func dowble(n int, ch chan int) {
-	ch <- n * n
-	// close(ch)
-}
-
-func sampleChannelLimit() {
+func sampleChannelBuffer() {
 	// channelのバッファ可能数を2個に制限
 	var ch chan int = make(chan int, 2)
 
 	ch <- 1
 	ch <- 2
-	// 最大を超えるためここでエラー
-	// fatal error: all goroutines are asleep - deadlock!
-	// ch <- 3
+	// ch <- 3 // An error will occur, but this is not bad code because this is just blocking.
+
 	fmt.Printf("%d, %d\n", <-ch, <-ch)
 
-	// 10回の入力を出力したら終了
-	end := make(chan int)
-	go func() {
-		time.Sleep(2 * time.Second)
-		for i := 0; i < 10; i++ {
-			fmt.Println(<-ch)
-		}
-		end <- 1
-	}()
+	// 上限付き同時処理実行
+	work := func(f func(int) int, values []int, buffer int) chan int{
+		running := make(chan bool, buffer)
+		ch := make(chan int)
+		go func() {
+			n := 0
 
-	i := 0
-	for {
-		// selectによってその処理が可能な場合にのみ処理される
-		//
-		// できる限りの速度でchに値を送信しているが、バッファ可能数は2のため、
-		// 上記の出力処理がバッファ分を利用するまでdefaultになる
-		// 例：アクセスしたいURLのリストを並べておき、それへのアクセスを実行(最大同時数の制限と、可能な限りの速度で実行することが可能)
-		//
-		select {
-		case ch <- i:
-			fmt.Printf("send %d\n", i)
-			i++
-		case <-end:
-			return
-		default:
-		}
+			for _, v := range values {
+				// change scope
+				v := v
+
+				// job start. Block with buffer
+				running <- true
+
+				go func() {
+					ch <- f(v)
+					<- running // one job end
+
+					// check comple
+					if n++; n == len(values) {
+						close(ch)
+					}
+				}()
+			}
+		}()
+
+		return ch
+	}
+
+	calc := func(v int) int {
+		// any times need this job
+		time.Sleep(1 * time.Second)
+
+		// complete
+		return v * 2
+	}
+
+	ch = work(calc, []int{1,2,3,4,5}, 3)
+	for i := range ch {
+		fmt.Println(i)
 	}
 }
 
