@@ -50,6 +50,7 @@ for i := range ch {}
 work := func(f func(int) int, values []int, buffer int) chan int{
   running := make(chan bool, buffer)
   ch := make(chan int)
+  var mu sync.Mutex
   go func() {
     n := 0
 
@@ -65,7 +66,10 @@ work := func(f func(int) int, values []int, buffer int) chan int{
         <- running // one job end
 
         // check comple
-        if n++; n == len(values) {
+        mu.Lock()
+        n++
+        mu.Unlock()
+        if n == len(values) {
           close(ch)
         }
       }()
