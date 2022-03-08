@@ -2,6 +2,44 @@
 
 - [context package \- context \- pkg\.go\.dev](https://pkg.go.dev/context)
 
+```go
+package main
+
+import (
+	"context"
+	"fmt"
+	"time"
+)
+
+func anyMain() {
+	// cancel() propagates to the entire child process
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	anyFunction(ctx)
+	time.Sleep(2 * time.Second)
+}
+
+func anyFunction(ctx context.Context) {
+	go func () {
+		ticker := time.NewTicker(300 * time.Millisecond)
+		defer ticker.Stop()
+
+		for {
+			select {
+			// catch cancel and close goroutine
+			case <- ctx.Done():
+				return
+			case <- ticker.C:
+				fmt.Println("tick tack")
+			// if write default, keep looping as much as possible.
+			// default:
+			}
+		}
+	}()
+}
+```
+
 **NOTE**
 
 - context can Cancel and set Deadline. when there ran `context.Done()` return true

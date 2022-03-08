@@ -68,18 +68,48 @@ func contextDone(runCancel2 bool) {
 	time.Sleep(1 * time.Second)
 }
 
+func anyMain() {
+	// cancel() propagates to the entire child process
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	anyFunction(ctx)
+	time.Sleep(2 * time.Second)
+}
+
+func anyFunction(ctx context.Context) {
+	go func () {
+		ticker := time.NewTicker(300 * time.Millisecond)
+		defer ticker.Stop()
+
+		for {
+			select {
+			// catch cancel and close goroutine
+			case <- ctx.Done():
+				return
+			case <- ticker.C:
+				fmt.Println("tick tack")
+			// if write default, keep looping as much as possible.
+			// default:
+			}
+		}
+	}()
+}
+
 func main() {
-	contextTimeout()
+	// contextTimeout()
 
-	fmt.Println("run cancel 1 ---------")
-	contextDone(false)
-	// done cancel1
-	// done cancel1
-	// ...
-	// done cancel2
+	// fmt.Println("run cancel 1 ---------")
+	// contextDone(false)
+	// // done cancel1
+	// // done cancel1
+	// // ...
+	// // done cancel2
 
-	fmt.Println("run cancel 2 ---------")
-	contextDone(true)
-	// done cancel2
+	// fmt.Println("run cancel 2 ---------")
+	// contextDone(true)
+	// // done cancel2
+
+	anyMain()
 
 }

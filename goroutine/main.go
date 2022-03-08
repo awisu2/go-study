@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"sync"
 	"time"
 )
 
@@ -67,28 +66,22 @@ func sampleChannelBuffer() {
 
 	// 上限付き同時処理実行
 	work := func(f func(int) int, values []int, buffer int) chan int{
-		running := make(chan bool, buffer)
+		running := make(chan int, buffer)
 		ch := make(chan int)
-		var mu sync.Mutex
 		go func() {
-			n := 0
-
-			for _, v := range values {
+			for i, v := range values {
 				// change scope
 				v := v
 
-				// job start. Block with buffer
-				running <- true
+				// job start and Block with buffer
+				running <- i
 
 				go func() {
 					ch <- f(v)
-					<- running // one job end
+					n := <- running // one job end
 
 					// check comple
-					mu.Lock()
-					n++
-					mu.Unlock()
-					if n == len(values) {
+					if n + 1 == len(values) {
 						close(ch)
 					}
 				}()
@@ -106,7 +99,7 @@ func sampleChannelBuffer() {
 		return v * 2
 	}
 
-	ch = work(calc, []int{1,2,3,4,5}, 3)
+	ch = work(calc, []int{1,2,3,4,5, 6,7,8,9,0,1,2,3,4,5,6,77,8,9,90}, 3)
 	for i := range ch {
 		fmt.Println(i)
 	}
