@@ -1,23 +1,32 @@
 # goroutine
 
-[goroutine](https://go-tour-jp.appspot.com/concurrency/1)
+- [goroutine](https://go-tour-jp.appspot.com/concurrency/1)
+- Can be safely closed when combined with conetxt: [context](../context-study/README.md)
+- Can be convinient use multi goroutine with errgroup: [errgroup](../errgroup-study/README.md)
+
+**NOTE**
 
 - goroutine の挙動
   - いつ終わるかわからない
   - 無限ループにするなら停止させる機構が必要(context など)
 - チャンネル
   - goroutine の外から中、中から外のどちらにも信号を送れる
-  - バッファ
+  - buffer
     - 空のときチャンネルの受信をブロック
     - 数が超えるときブロック
+  - non buffer channel. I think it same behavior buffer 1 channel. (`make(chan {any})` == `make(chan {any}, 1)`)
   - An error will occur if channel is blocked and goroutine does not exist
     - stop main process + no goroutine = process can't run more.
 - select の活用
   - バッファ持ちのチャンネルへの入力と default で、上限だった場合は弾く
   - 複数のチャンネルを待機する daemon 処理
 - 各種パターンでの利用
-  - 上限付き同時処理(処理数固定式)
+  - 上限付き同時処理(処理数固定式): 処理直前に動作数管理チャンネルに値をセット完了時に受信。これに対しforを行う。サンプルは下記。
+    - errgroupを利用したpiplineパターンでの実装もある。完了条件の判断がチャンネルでできるのでこちらのほうがわかりやすいか
     - リストへ add することで適時処理を実行する daemon
+  - cleanStop: daemon化したgoroutineを正常に終了させるサンプル(サンプルを後述)
+    - 単に適当なチャンネルを作ってcloseするだけ
+    - contextのcancelはいわゆる例外処理のため, 正常なクローズは自前で用意する必要あり
 
 ## samples
 
@@ -35,6 +44,42 @@ v := <- ch // wait channel response and get value
 // with range
 for range ch {}
 for i := range ch {}
+```
+
+## cleanStop
+
+実際には呼び出し側に停止用チャンネルを返却するなどになると思われる
+
+```go
+// ただcloseするだけのチャンネルを作って完了時にcloseするだけ
+// contextのCancelはいわゆる例外処理的なものなので、正常なgoroutineの完了処理は自分で作る必要がある
+func cleanStop(ctx context.Context) error {
+	// channel for stop
+	stop := make(chan bool)
+	g, ctx := errgroup.WithContext(ctx)
+
+	// 複数のgoroutineが動作しても大丈夫
+	for i := 0; i < 10; i++ {
+		g.Go(func() error {
+			for {
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				case <-stop:
+					return nil
+				}
+			}
+		})
+	}
+
+	go func() {
+		time.Sleep(1 * time.Second)
+		// stop
+		close(stop)
+	}()
+
+	return g.Wait()
+}
 ```
 
 ### 上限付き同時実行(処理数固定式)

@@ -49,8 +49,7 @@ my go study
 
 - [goroutine](./goroutine): goroutine
 - [context](./context-study/): context it's can Canceling, Set timeout, and carrie values.
-- errgroup
-  - [errgroup package \- golang\.org/x/sync/errgroup \- pkg\.go\.dev](https://pkg.go.dev/golang.org/x/sync/errgroup#ex-Group--Pipeline)
+- [errgroup](./errgroup-study/README.md): synchronize multi goroutines. may be need context.
 
 ## command line
 

@@ -1,8 +1,11 @@
-module github.com/awisu2/go-study/context-study
+module github.com/awisu2/go-study/errgroup-study
 
 go 1.17
 
-require github.com/stretchr/testify v1.7.0
+require (
+	github.com/stretchr/testify v1.7.0
+	golang.org/x/sync v0.0.0-20210220032951-036812b2e83c
+)
 
 require (
 	github.com/davecgh/go-spew v1.1.0 // indirect

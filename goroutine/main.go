@@ -1,8 +1,11 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"time"
+
+	"golang.org/x/sync/errgroup"
 )
 
 func main() {
@@ -15,18 +18,18 @@ func main() {
 
 func sampleHello() {
 	go func() {
-		fmt.Println("world")		
+		fmt.Println("world")
 	}()
 	fmt.Println("hello")
-	time.Sleep(1* time.Second) // If don't sleep, world will not output
+	time.Sleep(1 * time.Second) // If don't sleep, world will not output
 
 }
 
 // SampleChannel()
-// 
+//
 // Channels can exchanged inside and outside goroutine
 //
-// Waiting for the channel to respond will stop the process. 
+// Waiting for the channel to respond will stop the process.
 // This means that if the channel does not return a response,
 // it will not run any further and will not complete
 func sampleChannel() {
@@ -42,13 +45,13 @@ func sampleChannel() {
 	}
 	go sum([]int{1, 2, 3}, ch)
 	go sum([]int{4, 5, 6}, ch)
-	go sum([]int{7, 8 , 9}, ch)
+	go sum([]int{7, 8, 9}, ch)
 
 	// Stop until the channel return a response
 	//
 	// The order of the return values will be different each times,
 	// because they are set in the order of processing completion.
-	a := <-ch // wait 1th response
+	a := <-ch          // wait 1th response
 	b, c := <-ch, <-ch // wati 2,3th response
 
 	fmt.Printf("%d, %d, %d\n", a, b, c)
@@ -65,7 +68,7 @@ func sampleChannelBuffer() {
 	fmt.Printf("%d, %d\n", <-ch, <-ch)
 
 	// 上限付き同時処理実行
-	work := func(f func(int) int, values []int, buffer int) chan int{
+	work := func(f func(int) int, values []int, buffer int) chan int {
 		running := make(chan int, buffer)
 		ch := make(chan int)
 		go func() {
@@ -78,10 +81,10 @@ func sampleChannelBuffer() {
 
 				go func() {
 					ch <- f(v)
-					n := <- running // one job end
+					n := <-running // one job end
 
 					// check comple
-					if n + 1 == len(values) {
+					if n+1 == len(values) {
 						close(ch)
 					}
 				}()
@@ -99,17 +102,16 @@ func sampleChannelBuffer() {
 		return v * 2
 	}
 
-	ch = work(calc, []int{1,2,3,4,5, 6,7,8,9,0,1,2,3,4,5,6,77,8,9,90}, 3)
+	ch = work(calc, []int{1, 2, 3, 4, 5, 6, 7, 8, 9, 0, 1, 2, 3, 4, 5, 6, 77, 8, 9, 90}, 3)
 	for i := range ch {
 		fmt.Println(i)
 	}
 }
 
-
 type PingPong struct {
-	Hit chan int
-	End chan bool
-	Name string
+	Hit   chan int
+	End   chan bool
+	Name  string
 	IsEnd bool
 }
 
@@ -119,14 +121,14 @@ func (pingPong *PingPong) Lary(partner *PingPong) {
 	for {
 		// 基本的には責任範囲を自身のinstanceにとどめておく
 		select {
-		case v := <- pingPong.Hit:
+		case v := <-pingPong.Hit:
 			if !pingPong.IsEnd {
 				time.Sleep(time.Second)
 				v += 1
 				fmt.Println(pingPong.Name, ":", v)
 				partner.Hit <- v
 			}
-		case <- pingPong.End:
+		case <-pingPong.End:
 			fmt.Println(pingPong.Name, ": end")
 			// 終了処理
 			//
@@ -175,9 +177,9 @@ func CreatePingPong(name string) *PingPong {
 	// INFO: endの型をint/boolと切り替えたがそれによっての動作は変わらなかった
 	hit := make(chan int)
 	end := make(chan bool, 1)
-	return &PingPong {
-		Hit: hit,
-		End: end,
+	return &PingPong{
+		Hit:  hit,
+		End:  end,
 		Name: name,
 	}
 }
@@ -202,8 +204,8 @@ func samplePingPong() {
 // 集中管理型
 type PingPongController struct {
 	Resist chan *PingPongPlayer
-	End chan bool
-	Hit chan *PingPongHit
+	End    chan bool
+	Hit    chan *PingPongHit
 
 	Players map[*PingPongPlayer]bool
 }
@@ -211,23 +213,24 @@ type PingPongController struct {
 func (c *PingPongController) Run() {
 	defer c.Close()
 
-	L: for {
+L:
+	for {
 		select {
-		case player := <- c.Resist:
+		case player := <-c.Resist:
 			fmt.Printf("resist %s\n", player.Name)
 			c.Players[player] = true
 
-		case hit := <- c.Hit:
+		case hit := <-c.Hit:
 
 			fmt.Printf("Hit %s %d\n", hit.Player.Name, hit.Num)
 			for player := range c.Players {
-				if (player != hit.Player) {
+				if player != hit.Player {
 					player.Hitted <- hit.Num
 					break
 				}
 			}
 
-		case <- c.End:
+		case <-c.End:
 			for player := range c.Players {
 				c.UnResist(player)
 			}
@@ -252,18 +255,19 @@ func (c *PingPongController) UnResist(player *PingPongPlayer) {
 
 type PingPongPlayer struct {
 	Controller *PingPongController
-	Name string
-	Hitted chan int
-	End chan bool
-	isEnd bool
+	Name       string
+	Hitted     chan int
+	End        chan bool
+	isEnd      bool
 }
 
 func (p *PingPongPlayer) Run() {
 	defer fmt.Println("PingPongPlayer Run End. " + p.Name)
-	
-	L: for {
+
+L:
+	for {
 		select {
-		case n, ok := <- p.Hitted:
+		case n, ok := <-p.Hitted:
 			if !ok {
 				fmt.Println("HItted close " + p.Name)
 				break L
@@ -282,10 +286,10 @@ func (p *PingPongPlayer) Run() {
 			}
 			p.Controller.Hit <- &PingPongHit{
 				Player: p,
-				Num: n + 1,
+				Num:    n + 1,
 			}
 
-		case <- p.End:
+		case <-p.End:
 			fmt.Printf("end %s\n", p.Name)
 			break L
 		}
@@ -301,24 +305,24 @@ func (p *PingPongPlayer) Close() {
 
 type PingPongHit struct {
 	Player *PingPongPlayer
-	Num int
+	Num    int
 }
 
-func CreatePingPongController() *PingPongController{
+func CreatePingPongController() *PingPongController {
 	return &PingPongController{
-		Resist: make(chan *PingPongPlayer),
-		End: make(chan bool),
-		Hit: make(chan *PingPongHit),
+		Resist:  make(chan *PingPongPlayer),
+		End:     make(chan bool),
+		Hit:     make(chan *PingPongHit),
 		Players: map[*PingPongPlayer]bool{},
 	}
 }
 
-func CreatePingPongPlayer(controller *PingPongController, name string) *PingPongPlayer{
+func CreatePingPongPlayer(controller *PingPongController, name string) *PingPongPlayer {
 	return &PingPongPlayer{
 		Controller: controller,
-		Name: name,
-		Hitted: make(chan int),
-		End: make(chan bool),
+		Name:       name,
+		Hitted:     make(chan int),
+		End:        make(chan bool),
 	}
 }
 
@@ -345,4 +349,34 @@ func samplePingPong2() {
 
 	// 終了処理待ち
 	time.Sleep(time.Second)
+}
+
+// ただcloseするだけのチャンネルを作って完了時にcloseするだけ
+// contextのCancelはいわゆる例外処理的なものなので、正常なgoroutineの完了処理は自分で作る必要がある
+func cleanStop(ctx context.Context) error {
+	// channel for stop
+	stop := make(chan bool)
+	g, ctx := errgroup.WithContext(ctx)
+
+	// 複数のgoroutineが動作しても大丈夫
+	for i := 0; i < 10; i++ {
+		g.Go(func() error {
+			for {
+				select {
+				case <-ctx.Done():
+					return ctx.Err()
+				case <-stop:
+					return nil
+				}
+			}
+		})
+	}
+
+	go func() {
+		time.Sleep(1 * time.Second)
+		// stop
+		close(stop)
+	}()
+
+	return g.Wait()
 }

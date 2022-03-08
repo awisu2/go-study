@@ -2,48 +2,16 @@
 
 - [context package \- context \- pkg\.go\.dev](https://pkg.go.dev/context)
 
-```go
-package main
-
-import (
-	"context"
-	"fmt"
-	"time"
-)
-
-func anyMain() {
-	// cancel() propagates to the entire child process
-	ctx, cancel := context.WithCancel(context.Background())
-	defer cancel()
-
-	anyFunction(ctx)
-	time.Sleep(2 * time.Second)
-}
-
-func anyFunction(ctx context.Context) {
-	go func () {
-		ticker := time.NewTicker(300 * time.Millisecond)
-		defer ticker.Stop()
-
-		for {
-			select {
-			// catch cancel and close goroutine
-			case <- ctx.Done():
-				return
-			case <- ticker.C:
-				fmt.Println("tick tack")
-			// if write default, keep looping as much as possible.
-			// default:
-			}
-		}
-	}()
-}
-```
-
 **NOTE**
 
+- usage:
+  - for safe close child process: create main or top process and set `defer cancel()`
+    - and use `<- ctx.Done():` in goroutine.
+  - for timeout: If that process need end in short time.
 - context can Cancel and set Deadline. when there ran `context.Done()` return true
   - in the goroutine can catch `context.Done()`. typically use close goroutine.
+  - `ctx.Done()` が動作した時、基本的にエラーが発生したと考え、`return ctx.Err()` と返却するのが基本
+    - いわゆる正常なクローズ操作には利用しないほうが良さそう。 `end := make(chan bool)` からの `close(end)` かな
 - context's `WithCancel`, `WithDeadline()` create child copy
 - when content run Cancel or Deadline. enable `context.Done()` current instance and children.
 - define context: `context.Background()`
