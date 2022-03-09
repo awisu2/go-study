@@ -75,6 +75,10 @@ my go study
 - [gorm](./gorm): ORM ライブラリ
 - [gorm-simple](./gorm-simple): gorm のかんたん実装
 
+## dependency injection
+
+- [wire](./wire-study/README.md)
+
 ## gui
 
 - [agouti](./agouti): ブラウザコントロール API サポート(テストや自動挙動確認用)
