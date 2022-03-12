@@ -39,3 +39,8 @@ go run .
   - `Wire.Bind` は interface を特定の 型と紐付ける。後続のproviderがinterfaceを必要とする場合に使用
   - `wire.Value` は 特定の型をBuild内でセットすることができる。(ex: provide string `wire.Value("str")`)
 
+## problem
+
+- Q: how to just set value in `wire.Build()`?
+  - ex: want only set route to webframework engine
+  - A: Even if don't use it, return one of the type value.

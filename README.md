@@ -20,6 +20,7 @@ my go study
 - [array-slice](./array-slice): array/slice
 - [callback](./callback-study/): callback functions
 - [commands](./commands/): go commands like `go run .`, `go build .`
+- [error/errors](./errgroup-study/README.md): error usage
 - [helloworld](./helloworld): hello world !
 - [file](./file): file
 - [godoc](./godoc-study/): `go doc` command
