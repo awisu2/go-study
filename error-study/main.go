@@ -94,7 +94,24 @@ func asIsError02() {
 	}
 }
 
+func asWithFmtWrap() {
+	// wrap
+	err := errors.New("base error")
+	errWrap := fmt.Errorf("wrap = %w = wrap.", err)
+
+	// as
+	var _err *ErrorA
+	if errors.As(errWrap, &_err) {
+		fmt.Println("ok. " + _err.Error())
+	} else {
+		fmt.Println("ng.")
+	}
+
+	fmt.Println(errWrap)
+}
+
 func main() {
 	asIsError01()
 	asIsError02()
+	asWithFmtWrap()
 }

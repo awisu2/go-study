@@ -4,8 +4,32 @@
 - [A Tour of Go](https://go-tour-jp.appspot.com/methods/20)
 
 ```go
+// basic interface
 type error interface {
     Error() string
+}
+
+// for errors interface(recomend)
+type CustomError interface {
+    Error() string
+    Is(target error) bool
+    Unwrap() error
+}
+
+// fmt can create error with `Unwrap() error` function
+err := errors.New("base error")
+errWrap := fmt.Errorf("wrap = %w = wrap.", err)
+fmt.Println(errWrap) // wrap = base error = wrap.
+
+// check error (Is, As)
+var cErr *CustomError
+if errors.As(err, &cErr) {
+  fmt.Printf("has same type error. detail %v\n", cErr)
+}
+
+var cErr CustomError{}
+if errors.Is(err, cErr) {
+  fmt.Printf("has same error. == %v\n", err)
 }
 ```
 
