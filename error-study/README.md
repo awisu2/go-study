@@ -16,7 +16,9 @@ type CustomError interface {
     Unwrap() error
 }
 
-// fmt can create error with `Unwrap() error` function
+// `fmt` can create error with `Unwrap() error` function
+// If not set %w Just create `error`
+// Maybe usually set %w at the end
 err := errors.New("base error")
 errWrap := fmt.Errorf("wrap = %w = wrap.", err)
 fmt.Println(errWrap) // wrap = base error = wrap.
